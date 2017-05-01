@@ -1,0 +1,15 @@
+
+
+Anita
+* Quitar lo que sobra (monito, y cubos de las otras casas, flechas )
+* Cambiar ventanas y colocar una con transparencias
+* CAmbiar textura de piso
+* revisar estante y colocar algo adentro
+
+
+
+Ismene
+- Agregar lampara de piso, y modificar lampara existente de techo..
+  agregar encendido y apagado de cada una
+- Agregar un cuadro 
+- Revisar ventilador y modificarlo
