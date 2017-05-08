@@ -1,6 +1,6 @@
 //..................................integrantes...................................//
-//............................Mendez Zurita Danilo Javier........................//
-//.............................Guzman Gonzalez Yessica...........................//
+//............................Miranda Castro Ana Karen........................//
+//.............................Ismene DOnaji Torres Camacho ...........................//
 //...............................................................................//
 
 
@@ -17,11 +17,8 @@
 #include "Camera.h"
 #include "cmodel/CModel.h"
 
-//NEW//////////////////NEW//////////////////NEW//////////////////NEW////////////////
 static GLuint ciudad_display_list;	//Display List for the Monito
 
-
-//NEW// Keyframes
 float posX =0, posY = 2.5, posZ =-3.5, rotRodIzq = 0;
 float giroMonito = 0;
 float rotMusIzq = 0;
@@ -37,7 +34,6 @@ boolean actJ1=TRUE;
 
 
 //Carga de Figuras
-
 #define MAX_FRAMES 10
 int i_max_steps = 25;
 int i_curr_steps = 0;
@@ -73,8 +69,6 @@ bool play=false;
 int playIndex=0;
 
 
-//NEW//////////////////NEW//////////////////NEW//////////////////NEW////////////////
-
 int w = 500, h = 500;
 int frame=0,time,timebase=0;
 char s[30];
@@ -85,31 +79,12 @@ GLfloat g_lookupdown = 0.0f;    // Look Position In The Z-Axis (NEW)
 
 int font=(int)GLUT_BITMAP_HELVETICA_18;
 
-//Otras opciones son:
-/*GLUT_BITMAP_8_BY_13
-GLUT_BITMAP_9_BY_15
-GLUT_BITMAP_TIMES_ROMAN_10
-GLUT_BITMAP_TIMES_ROMAN_24
-GLUT_BITMAP_HELVETICA_10
-GLUT_BITMAP_HELVETICA_12
-GLUT_BITMAP_HELVETICA_18*/
+//luces
 
-
-//GLfloat Diffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };				// Diffuse Light Values
-GLfloat Diffuse[]= { 0.5f, 0.5f, 0.5f, 1.0f };				// Diffuse Light Values
-GLfloat Specular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values
-GLfloat Position[]= { 0.0f, 7.0f, -5.0f, 0.0f };			// Light Position
-GLfloat Position2[]= { 0.0f, 0.0f, -5.0f, 1.0f };			// Light Position
-
-GLfloat m_dif1[] = { 0.0f, 0.2f, 1.0f, 1.0f };				// Diffuse Light Values
-GLfloat m_spec1[] = { 0.0, 0.0, 0.0, 1.0 };				// Specular Light Values
-GLfloat m_amb1[] = { 0.0, 0.0, 0.0, 1.0 };				// Ambiental Light Values
-GLfloat m_s1[] = {18};
-
-GLfloat m_dif2[] = { 0.8f, 0.2f, 0.0f, 1.0f };				// Diffuse Light Values
-GLfloat m_spec2[] = { 0.0, 0.0, 0.0, 1.0 };				// Specular Light Values
-GLfloat m_amb2[] = { 0.0, 0.0, 0.0, 1.0 };				// Ambiental Light Values
-GLfloat m_s2[] = {22};
+GLfloat LightAmbient[] = { 0.0f, 0.0f, 0.0f, 1.0f }; 			// Ambient Light Values negro
+GLfloat LightDiffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };				// Diffuse Light Values blanco
+GLfloat LightSpecular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values blanco
+bool	light = false;
 
 CTexture text1;
 CTexture text2;
@@ -117,9 +92,6 @@ CTexture text3;	//Flecha
 CTexture text4;	//Pavimento
 CTexture text5;	//Pasto01
 CTexture text6;	//Casa01
-
-
-//NEW///////////////////////////7
 
 CTexture textMesa;
 CTexture textPata;
@@ -145,7 +117,7 @@ CTexture textGrass;
 CTexture textSky;
 CTexture textLibrero;
 
-//***ROSE****
+
 CTexture textAlmohada;
 CTexture textColcha;
 CTexture textMaderaBuro;
@@ -157,8 +129,7 @@ CTexture textTeclado;
 CTexture textTouchPad;
 CTexture textGW;
 
-//CFiguras fig1;
-//CFiguras fig5;
+
 CFiguras tablaMesa;
 CFiguras pata1Mesa;
 CFiguras pata2Mesa;
@@ -173,7 +144,7 @@ CFiguras techoCasa;
 CFiguras pisoCasa;
 CFiguras cubo;
 CFiguras sky;
-//*****ROSE*****
+
 
 CFiguras cama;
 CFiguras buro;
@@ -182,7 +153,7 @@ CFiguras lampara;
 CFiguras laptop;
 
 float abrirPuerta = 0;
-//END NEW//////////////////////////////////////////
+
 
 CFiguras fig1;
 CFiguras fig2;
@@ -192,7 +163,7 @@ CFiguras fig5;	//Casa01
 CFiguras fig6;
 CFiguras fig7;	//Para crear Monito
 
-//////////////////////Sillas
+//Sillas
 CTexture Metal;
 CTexture Forro;
 CTexture Forro1;
@@ -2188,22 +2159,8 @@ GLuint createDL()
 void InitGL ( GLvoid )     // Inicializamos parametros
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Negro de fondo	
-
-	glEnable(GL_TEXTURE_2D);
-
+	//glEnable(GL_TEXTURE_2D);
 	glShadeModel (GL_SMOOTH);
-	//Para construir la figura comentar esto
-	glLightfv(GL_LIGHT1, GL_POSITION, Position);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, Diffuse);
-	//glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, Position2);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	//glEnable(GL_LIGHT1);
-
-	//glEnable ( GL_COLOR_MATERIAL );
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
-	//glPolygonMode(GL_BACK, GL_LINE);
 
 	glClearDepth(1.0f);									// Configuramos Depth Buffer
 	glEnable(GL_DEPTH_TEST);							// Habilitamos Depth Testing
@@ -2212,10 +2169,6 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 
 	glEnable(GL_AUTO_NORMAL);
 	glEnable(GL_NORMALIZE);
-
-	/* setup blending */
-    //glBlendFunc(GL_SRC_ALPHA,GL_ONE);			// Set The Blending Function For Translucency
-    //glColor4f(1.0f, 1.0f, 1.0f, 0.5); 
     
     text1.LoadBMP("01.bmp");
 	text1.BuildGLTexture();
@@ -2482,6 +2435,18 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 
 }
 
+void luces() {
+	glLightfv(GL_LIGHT0, GL_AMBIENT, LightAmbient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, LightDiffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, LightSpecular);
+
+
+	/*glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmbient2);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse2);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, LightSpecular2);
+	glLightfv(GL_LIGHT1, GL_POSITION, SPosition);
+	glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, SPosition2);*/
+}
 void pintaTexto(float x, float y, float z, void *font,char *string)
 {
   
@@ -2496,14 +2461,21 @@ void pintaTexto(float x, float y, float z, void *font,char *string)
 
 void display ( void )   // Creamos la funcion donde se dibuja
 {
-	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	glLoadIdentity();
 	glPushMatrix();
 	
+	//CONTROL DE LUCES
+	luces();
+	if (light)
+		glEnable(GL_LIGHT0);
+	else
+		glDisable(GL_LIGHT0);
+
+	glEnable(GL_LIGHTING);
+	//FIN DE CONTROL DE LUCES
 
 	glRotatef(g_lookupdown,1.0f,0,0);
-
 		gluLookAt(	objCamera.mPos.x,  objCamera.mPos.y,  objCamera.mPos.z,	
 					objCamera.mView.x, objCamera.mView.y, objCamera.mView.z,	
 					objCamera.mUp.x,   objCamera.mUp.y,   objCamera.mUp.z);
@@ -2832,7 +2804,7 @@ void display ( void )   // Creamos la funcion donde se dibuja
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_LIGHTING);
 			glColor3f(1.0,0.0,0.0);
-			pintaTexto(-11,12.0,-14.0,(void *)font,"Practica 11");
+			pintaTexto(-11,12.0,-14.0,(void *)font,"Proyecto Final - Laboratorio");
 			pintaTexto(-11,10.5,-14,(void *)font,"Listas de Dibujo");
 			pintaTexto(-11,8.5,-14,(void *)font,s);
 			glColor3f(1.0,1.0,1.0);
@@ -3074,60 +3046,13 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 			posX++;
 			printf("%f \n", posX);
 			break;
-
-		case 'b':						
-			rotRodIzq++;
-			printf("%f \n", rotRodIzq);
-			break;
-
-		case 'B':						
-			rotRodIzq--;
-			printf("%f \n", rotRodIzq);
-			break;
-		case 'q':
-			rotMusIzq++;
-			printf("%f \n", rotMusIzq);
-			break;
-		case 'Q':
-			rotMusIzq--;
-			printf("%f \n", rotMusIzq);
-			break;
-
-		case 'z':
-			rotBraIzq++;
-			rotBraDer--;
-			printf("%f \n", rotBraIzq);
-			printf("%f \n", rotBraDer);
-			break;
 		case 'Z':
-			rotBraIzq--;
-			rotBraDer++;
-			printf("%f \n", rotBraIzq);
-			printf("%f \n", rotBraDer);
+			light = !light;
+			if (light)
+				printf("encender luz\n");
+			else
+				printf("apagar luz\n");
 			break;
-
-		case 'v':
-			rotBraIzqEn++;
-			rotBraDerEn--;
-			printf("%f \n", rotBraIzqEn);
-			printf("%f \n", rotBraDerEn);
-			break;
-		case 'V':
-			rotBraIzqEn--;
-			rotBraDerEn++;
-			rotD++;
-			printf("%f \n", rotBraIzqEn);
-			//printf("%f \n", rotBraDer);
-			break;
-
-		case 'p':						
-			giroMonito++;
-			break;
-
-		case 'P':						
-			giroMonito--;
-			break;
-
 		case '2':
 			objCamera.Position_Camera(25, 4.0f, -20, 25, 2.5f, -45, 0, 1, 0);
 			break;
