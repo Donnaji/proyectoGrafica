@@ -87,9 +87,23 @@ GLfloat LightSpecular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values bl
 bool	light = false;
 
 GLfloat LightAmbient1[] = { 1.0f, 0.0f, 0.0f, 1.0f }; 			// Ambient Light Values 
-GLfloat LightDiffuse1[] = { 0.2f, 1.0f, 0.2f, 1.0f };				// Diffuse Light Values 
+GLfloat LightDiffuse1[] = { 0.5f, 0.0f, 0.8f, 1.0f };				// Diffuse Light Values 
 GLfloat LightSpecular1[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values blanco
 bool	light1 = false;
+GLfloat LightPosition1[] = { 0.0f, 0.0f, 1.0f, 0.0f };
+
+//bronze
+GLfloat mat_ambient[] = { 0.2125, 0.1275, 0.054, 1.0 };					// Color background
+GLfloat mat_diffuse[] = { 0.714, 0.4284, 0.18144 , 1.0 };					// Object Color main 
+GLfloat mat_specular[] = { 0.3935, 0.2719, 0.1667, 1.0 };				// Specular color
+GLfloat mat_shininess[] = { 0.2 * 128 };
+
+
+//RUBY
+GLfloat mat_Rambient[] = { 0.1745, 0.01175, 0.01175, 1.0 };					// Color background
+GLfloat mat_Rdiffuse[] = {0.61424,  0.04136, 0.04136, 1.0 };					// Object Color main 
+GLfloat mat_Rspecular[] = { 0.727811, 0.626959, 0.626959, 1.0 };				// Specular color
+GLfloat mat_Rshininess[] = { 0.6 * 128 };
 
 CTexture text1;
 CTexture text2;
@@ -1344,9 +1358,16 @@ void monito()
 
 void VentiladorT() {	
 		glPushMatrix();
+
+		//material bronze
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+		glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+		glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
 			glRotatef(rotV, 0, 1, 0);
 			glPushMatrix();//Centro
-				glColor3f(0,0,0);				
+				//glColor3f(0,0,0);				
 				fig7.esfera(0.75, 15, 15, 0);
 
 				glPushMatrix();//Soporte										
@@ -2460,14 +2481,6 @@ void display ( void )   // Creamos la funcion donde se dibuja
 	else
 		glDisable(GL_LIGHT0);
 
-	/*glPushMatrix();
-	glPopMatrix();
-
-	if (light1)
-		glEnable(GL_LIGHT1);
-	else
-		glDisable(GL_LIGHT1);*/
-
 	glEnable(GL_LIGHTING);
 	//FIN DE CONTROL DE LUCES
 
@@ -2509,13 +2522,7 @@ void display ( void )   // Creamos la funcion donde se dibuja
 			silla();
 			glPopMatrix();
 
-			glPushMatrix(); //-------------------------------Creamos jenga
-				glDisable(GL_LIGHTING);
-				glTranslatef(11,1.5,-10);
-				glScalef(0.5, 0.5, 0.5);
-				Jenga();
-				glEnable(GL_LIGHTING);
-			glPopMatrix();
+			
 			glPushMatrix();
 			glDisable(GL_COLOR_MATERIAL);//........................Poner mesa 3ds
 				glRotatef(0, 1, 0, 0);
@@ -2581,14 +2588,33 @@ void display ( void )   // Creamos la funcion donde se dibuja
 				glEnable(GL_LIGHTING);
 			glPopMatrix();
 
-			glPushMatrix();//.........................dibuja ventilador
+			glPushMatrix();//ventilador y luz de techo
 				glRotatef(0, 0,1,0);
-				glTranslatef(30,7.5,-15);
-				glScalef(0.3,0.3,0.3);
-				//glDisable(GL_LIGHTING);
+				glTranslatef(30,7.5,-15);					
+				glPushMatrix();
+					glTranslatef(0, -2, 0);
+					glScalef(1.2, 1.2, 1.2);
+					glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_Rdiffuse);
+					glMaterialfv(GL_FRONT, GL_AMBIENT, mat_Rambient);
+					glMaterialfv(GL_FRONT, GL_SPECULAR, mat_Rspecular);
+					glMaterialfv(GL_FRONT, GL_SHININESS, mat_Rshininess);
+
+					glLightfv(GL_LIGHT1, GL_POSITION, LightPosition1);
+					glColor3f(1.0, 0.0, 0.0);
+					lampara.cono(2.0, 0.4, 100, textLampara.GLindex);	
+
+					glDisable(GL_LIGHTING);
+						if (light1)
+							glEnable(GL_LIGHT1);
+						else
+							glDisable(GL_LIGHT1);
+					glEnable(GL_LIGHTING);
+				glPopMatrix();
+				glScalef(0.3, 0.3, 0.3);
 				VentiladorT();
-				//glEnable(GL_LIGHTING);
 			glPopMatrix();
+
+			
 
 			glPushMatrix();//...........................dibujamos sillon 3ds
 				glTranslatef(40,0,-27);
@@ -2612,18 +2638,7 @@ void display ( void )   // Creamos la funcion donde se dibuja
 			glScalef(0.05, 0.05, 0.05);
 			glTranslatef(120, 5, 550);
 			pin.GLrender(NULL, _SHADED, 1.0);  //_WIRED O _POINTS
-			glPopMatrix();
-
-			/*glPushMatrix();//....................................modelo mueble 3ds
-				glTranslatef(30,0,-8);
-				//glRotatef(-90,0,1,0);
-				glScalef(0.03,0.03,0.03);
-				//glDisable(GL_LIGHTING);
-				mueble.GLrender(NULL,_SHADED,1.0);
-				glEnable(GL_LIGHTING);
-			glPopMatrix();*/
-
-			
+			glPopMatrix();			
 
 			glPushMatrix();//...........................dibujamos libros
 				glTranslatef(20,1.85,-26);
@@ -2655,40 +2670,7 @@ void display ( void )   // Creamos la funcion donde se dibuja
 				glTranslatef(23.5,1,-22);
 				glRotatef(90, 0,1,0);
 				silla(0.3,0.15,0.3,0,0,0);
-			glPopMatrix();
-
-			glPushMatrix(); //...................Creamos  pieza  jenga
-				//glDisable(GL_LIGHTING);
-				glTranslatef(26, 1.8, -23);
-				//glTranslatef(rotBraDer, 0, 0);
-				glRotatef(rotD,0,1,0);
-				glScalef(1, 0.2, 0.33);
-				glScalef(0.5, 0.5, 0.5);
-				fig7.prisma2(jenga.GLindex,jenga.GLindex);
-				glEnable(GL_LIGHTING);
-			glPopMatrix();
-
-			glPushMatrix(); //...................Creamos  pieza  jenga
-				//glDisable(GL_LIGHTING);
-				glTranslatef(26, 1.8, -21);
-				//glTranslatef(rotBraDer, 0, 0);
-				glScalef(1, 0.2, 0.33);
-				glScalef(0.5, 0.5, 0.5);
-				fig7.prisma2(Forro.GLindex,Forro.GLindex);
-				glEnable(GL_LIGHTING);
-			glPopMatrix();
-
-			glPushMatrix(); //...................Creamos  pieza  jenga
-				//glDisable(GL_LIGHTING);
-				glTranslatef(24.8, 1.8, -22);
-				//glTranslatef(rotBraDer, 0, 0);
-				glScalef(1, 0.2, 0.33);
-				glScalef(0.5, 0.5, 0.5);
-				fig7.prisma2(jenga.GLindex,jenga.GLindex);
-				glEnable(GL_LIGHTING);
-			glPopMatrix();
-
-			
+			glPopMatrix();			
 
 			glPushMatrix();
 				glEnable ( GL_COLOR_MATERIAL );
@@ -2699,7 +2681,6 @@ void display ( void )   // Creamos la funcion donde se dibuja
 					monito();
 				glDisable ( GL_COLOR_MATERIAL );
 			glPopMatrix();	
-
 			
 
 			glPushMatrix(); //Flecha
@@ -2728,36 +2709,8 @@ void display ( void )   // Creamos la funcion donde se dibuja
 				glScalef(0.3, 0.3, 0.3);
 					casa();
 				
-				glPushMatrix();
+			glPushMatrix();
 					
-					//****LIBROS****
-
-					
-
-					
-					//****COMEDOR***
-					/*glPushMatrix();
-						glTranslatef(-20,0,25);
-						glScalef(1.3,1.3,1.3);
-						comedor();
-					glPopMatrix();
-					//mesa y laptop
-					glPushMatrix();
-						glRotatef(90, 0,1,0);
-						mesa(1,1.5,1,-25,1.4,24);
-					glPopMatrix();
-				
-					glPushMatrix();
-						glRotatef(90, 0,1,0);
-						dibujaLaptop(.3,.3,.3,-90,9,77);
-					glPopMatrix();
-
-					glPushMatrix();
-						glRotatef(280, 0,1,0);
-						silla(1,1,1,29,0,-24.5);
-					glPopMatrix();*/
-
-					//*****ROSE*****
 					glPushMatrix(); 
 						glPushMatrix();
 							glTranslatef(0,0,-0.5); 
@@ -2769,14 +2722,9 @@ void display ( void )   // Creamos la funcion donde se dibuja
 							glRotatef(90, 0,1,0); 
 							//dibujaBuro(1,1,1,-2,-9.5,-42.0); 
 						glPopMatrix();
-						glPushMatrix();
-							glTranslatef(0,47,0);
-							glScalef(1.2,1.2,1.2);
-							lampara.cono(2.0,0.4,100,textLampara.GLindex);
-						glPopMatrix();
+						
 					glPopMatrix();
-					//******JOAN*****
-					//ropero
+					
 					glPushMatrix();
 						glRotatef(0, 0,1,0);
 						glTranslatef(-36.5,23,-65.5);
@@ -2799,8 +2747,7 @@ void display ( void )   // Creamos la funcion donde se dibuja
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_LIGHTING);
 			glColor3f(1.0,0.0,0.0);
-			pintaTexto(-11,12.0,-14.0,(void *)font,"Proyecto Final - Laboratorio");
-			pintaTexto(-11,10.5,-14,(void *)font,"Listas de Dibujo");
+			pintaTexto(-11,12.0,-14.0,(void *)font,"Proyecto Final - Laboratorio");			
 			pintaTexto(-11,8.5,-14,(void *)font,s);
 			glColor3f(1.0,1.0,1.0);
 		glEnable(GL_LIGHTING);
