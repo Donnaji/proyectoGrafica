@@ -20,9 +20,17 @@ class CFiguras
 	void prisma (float altura, float largo, float profundidad, GLuint text, GLuint text1, GLuint text2, GLuint text3, GLuint text4, GLuint text5);//Funcíon creacion prisma
 	void prisma2 (GLuint text, GLuint text2);
 	void skybox(float altura, float largo, float profundidad, GLuint text);	//Funcion creacion cielo
-	void skybox2 (float altura, float largo, float profundidad, GLuint text);
+
+
 	void dodecaedro (GLuint text,GLuint text1);
-	
+
+	//Casa
+	void pared_int (float altura, float largo, float profundidad, GLuint text1,GLuint text2,GLuint text3);
+	void pared_ext (float altura, float largo, float profundidad, GLuint text1);
+	void pared (float altura, float largo, float profundidad, GLuint text1,GLuint text2);
+	void techo (float altura, float largo, float profundidad, GLuint text,GLuint text1);
+	void piso (float altura, float largo, float profundidad, GLuint text1);
+
 	//void torus(GLfloat radioM, GLfloat radiom, int meridianos, int paralelos, GLuint text );
 	void torus(GLfloat radioM, GLfloat radiom, int meridianos, int paralelos);
 
