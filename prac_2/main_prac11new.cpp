@@ -86,6 +86,11 @@ GLfloat LightDiffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };				// Diffuse Light Values 
 GLfloat LightSpecular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values blanco
 bool	light = false;
 
+GLfloat LightAmbient1[] = { 1.0f, 0.0f, 0.0f, 1.0f }; 			// Ambient Light Values 
+GLfloat LightDiffuse1[] = { 0.2f, 1.0f, 0.2f, 1.0f };				// Diffuse Light Values 
+GLfloat LightSpecular1[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values blanco
+bool	light1 = false;
+
 CTexture text1;
 CTexture text2;
 CTexture text3;	//Flecha
@@ -1337,73 +1342,57 @@ void monito()
 	//glEndList();
 }
 
-//NEW CASA//////////////////////////////////////
-
-void VentiladorT()
-{
-	//glNewList(1, GL_COMPILE)
+void VentiladorT() {	
 		glPushMatrix();
 			glRotatef(rotV, 0, 1, 0);
-
 			glPushMatrix();//Centro
-				glColor3f(0,0,0);
-				glTranslatef(0.0, 0.0, 0);
+				glColor3f(0,0,0);				
 				fig7.esfera(0.75, 15, 15, 0);
-			glPopMatrix();
-			
-			glPushMatrix();//Soporte
-			glColor3f(0,0,0);
-			glTranslatef(0.0, 0.0, 0.0);
-			fig7.cilindro(0.15, 4.5, 15, 0);
-			glPopMatrix();
-			
-			glPushMatrix();//Helices
-				glTranslatef(0.0, 0, 0);
-				fig7.prisma(0.1, 15, 0.75, 0,0,0,0,0,0);
-			glPopMatrix();
-			glPushMatrix();//Helices
-				glTranslatef(0.0, 0, 0);
-				glRotatef(22.5, 0, 1, 0);
-				fig7.prisma(0.1, 15, 0.75, 0,0,0,0,0,0);
-			glPopMatrix();
-			glPushMatrix();//Helices
-				glTranslatef(0.0, 0, 0);
-				glRotatef(45, 0, 1, 0);
-				fig7.prisma(0.1, 15, 0.75, 0,0,0,0,0,0);
-			glPopMatrix();
-			glPushMatrix();//Helices
-				glTranslatef(0.0, 0, 0);
-				glRotatef(67.5, 0, 1, 0);
-				fig7.prisma(0.1, 15, 0.75, 0,0,0,0,0,0);
-			glPopMatrix();
-			glPushMatrix();//Helices
-				glTranslatef(0.0, 0, 0);
-				glRotatef(90, 0, 1, 0);
-				fig7.prisma(0.1, 15, 0.75, 0,0,0,0,0,0);
-			glPopMatrix();
-			glPushMatrix();//Helices
-				glTranslatef(0.0, 0, 0);
-				glRotatef(112.5, 0, 1, 0);
-				fig7.prisma(0.1, 15, 0.75, 0,0,0,0,0,0);
-			glPopMatrix();
-			glPushMatrix();//Helices
-				glTranslatef(0.0, 0, 0);
-				glRotatef(135, 0, 1, 0);
-				fig7.prisma(0.1, 15, 0.75, 0,0,0,0,0,0);
-			glPopMatrix();
-			glPushMatrix();//Helices
-				glTranslatef(0.0, 0, 0);
-				glRotatef(157.5, 0, 1, 0);
-				fig7.prisma(0.1, 15, 0.75, 0,0,0,0,0,0);
-			glPopMatrix();
 
+				glPushMatrix();//Soporte										
+					fig7.cilindro(0.15, 4.5, 15, 0);
 
-		glPopMatrix();
+					glPushMatrix();//Helices
+						fig7.prisma(0.1, 15, 1.0, 0, 0, 0, 0, 0, 0);
+					glPopMatrix();
 
+					glPushMatrix();//Helices						
+						glRotatef(22.5, 0, 1, 0);
+						fig7.prisma(0.1, 15, 0.3, 0, 0, 0, 0, 0, 0);
+					glPopMatrix();
 
-		//glColor3f(1, 1, 1);
-	glPopMatrix();
-	//glEndList();
+					glPushMatrix();//Helices						
+						glRotatef(45, 0, 1, 0);
+						fig7.prisma(0.1, 15, 1.0, 0, 0, 0, 0, 0, 0);
+					glPopMatrix();
+
+					glPushMatrix();//Helices						
+						glRotatef(67.5, 0, 1, 0);
+						fig7.prisma(0.1, 15, 0.3, 0, 0, 0, 0, 0, 0);
+					glPopMatrix();
+
+					glPushMatrix();//Helices						
+						glRotatef(90, 0, 1, 0);
+						fig7.prisma(0.1, 15, 1.0, 0, 0, 0, 0, 0, 0);
+					glPopMatrix();
+
+					glPushMatrix();//Helices						
+						glRotatef(112.5, 0, 1, 0);
+						fig7.prisma(0.1, 15, 0.3, 0, 0, 0, 0, 0, 0);
+					glPopMatrix();
+
+					glPushMatrix();//Helices						
+						glRotatef(135, 0, 1, 0);
+						fig7.prisma(0.1, 15, 1.0, 0, 0, 0, 0, 0, 0);
+					glPopMatrix();
+
+					glPushMatrix();//Helices						
+						glRotatef(157.5, 0, 1, 0);
+						fig7.prisma(0.1, 15, 0.3, 0, 0, 0, 0, 0, 0);
+					glPopMatrix();
+				glPopMatrix(); //soporte
+			glPopMatrix(); //centro
+		glPopMatrix();//ventilador	
 }
 
 void dibujaLaptop(GLfloat xMadera, GLfloat yMadera, GLfloat zMadera, GLfloat xPosBuro, GLfloat yPosBuro, GLfloat zPosBuro)
@@ -2440,12 +2429,11 @@ void luces() {
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, LightDiffuse);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, LightSpecular);
 
+	glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmbient1);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse1);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, LightSpecular1);
 
-	/*glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmbient2);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse2);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, LightSpecular2);
-	glLightfv(GL_LIGHT1, GL_POSITION, SPosition);
-	glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, SPosition2);*/
+
 }
 void pintaTexto(float x, float y, float z, void *font,char *string)
 {
@@ -2471,6 +2459,14 @@ void display ( void )   // Creamos la funcion donde se dibuja
 		glEnable(GL_LIGHT0);
 	else
 		glDisable(GL_LIGHT0);
+
+	/*glPushMatrix();
+	glPopMatrix();
+
+	if (light1)
+		glEnable(GL_LIGHT1);
+	else
+		glDisable(GL_LIGHT1);*/
 
 	glEnable(GL_LIGHTING);
 	//FIN DE CONTROL DE LUCES
@@ -2589,9 +2585,9 @@ void display ( void )   // Creamos la funcion donde se dibuja
 				glRotatef(0, 0,1,0);
 				glTranslatef(30,7.5,-15);
 				glScalef(0.3,0.3,0.3);
-				glDisable(GL_LIGHTING);
+				//glDisable(GL_LIGHTING);
 				VentiladorT();
-				glEnable(GL_LIGHTING);
+				//glEnable(GL_LIGHTING);
 			glPopMatrix();
 
 			glPushMatrix();//...........................dibujamos sillon 3ds
@@ -2723,8 +2719,7 @@ void display ( void )   // Creamos la funcion donde se dibuja
 				fig3.prisma_anun(Plastico.GLindex, 0);
 				glEnable(GL_LIGHTING);
 			glPopMatrix();
-			//CASA///////////////////
-			//¨****casa*****
+			
 			glPushMatrix();
 				glScalef(1.0, 0.5, 1.0);
 				glTranslatef(30, 3, -17.2);
@@ -3052,6 +3047,13 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 				printf("encender luz\n");
 			else
 				printf("apagar luz\n");
+			break;
+		case 'z':
+			light1 = !light1;
+			if (light1)
+				printf("encender luz 1\n");
+			else
+				printf("apagar luz 1\n");
 			break;
 		case '2':
 			objCamera.Position_Camera(25, 4.0f, -20, 25, 2.5f, -45, 0, 1, 0);
