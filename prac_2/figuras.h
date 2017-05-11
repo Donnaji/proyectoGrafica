@@ -19,6 +19,7 @@ class CFiguras
 	void prisma_anun (GLuint text, GLuint text2);							//Funcíon creacion movimiento
 	void prisma (float altura, float largo, float profundidad, GLuint text, GLuint text1, GLuint text2, GLuint text3, GLuint text4, GLuint text5);//Funcíon creacion prisma
 	void prisma2 (GLuint text, GLuint text2);
+	void prisma3(float altura, float largo, float profundidad, GLuint text);
 	void skybox(float altura, float largo, float profundidad, GLuint text);	//Funcion creacion cielo
 
 
