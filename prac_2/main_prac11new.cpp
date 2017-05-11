@@ -195,7 +195,7 @@ CTexture Tapiz;
 CTexture jenga;
 
 //Muebles 3ds
-CModel Mesa;
+//CModel Mesa;
 CModel sillon;
 CModel sillon2;
 CModel mueble;
@@ -229,6 +229,12 @@ CTexture fire_ch;
 CTexture Dodecaedro;
 CTexture sillon3;
 
+//// Mesa 
+//Figura para mesa
+CFiguras Base1;
+//Textura Mesa
+CTexture MaderaBase1;
+CTexture Madera;
 
 
 
@@ -889,7 +895,79 @@ void casa(void) {
 
 	return;
 }
+	/////Mesa
 
+void Mesa (/*GLfloat xTMesa, GLfloat yTMesa, GLfloat zTMesa*/)
+	{
+		//glTranslatef(xTMesa, yTMesa, zTMesa);
+
+			glPushMatrix(); //Base 1
+				glTranslatef(1.50, 0.7, -1.5);
+				glScalef(0.1,0.1,0.5);
+				Base1.prisma3(1.0, 1.0, 1.0,MaderaBase1.GLindex);
+			glPopMatrix();
+
+			glPushMatrix(); //Base 2
+				glTranslatef(2.0, 0.7, -1.5);
+				glScalef(0.1,0.1,0.5);
+				Base1.prisma3(1.0, 1.0, 1.0,MaderaBase1.GLindex);
+			glPopMatrix();
+
+			glPushMatrix(); //Patita
+				glTranslatef(1.50, 1.10, -1.20);
+				glScalef(0.1,0.9,0.1);
+				Base1.prisma3(1.0, 1.0, 1.0,MaderaBase1.GLindex);
+			glPopMatrix();
+
+			glPushMatrix(); //Patita
+				glTranslatef(1.50, 1.10, -1.80);
+				glScalef(0.1,0.9,0.1);
+				Base1.prisma3(1.0, 1.0, 1.0,MaderaBase1.GLindex);
+			glPopMatrix();
+
+			glPushMatrix(); //Patita
+				glTranslatef(2.0, 1.10, -1.20);
+				glScalef(0.1,0.9,0.1);
+				Base1.prisma3(1.0, 1.0, 1.0,MaderaBase1.GLindex);
+			glPopMatrix();
+
+			glPushMatrix(); //Patita
+				glTranslatef(2.0, 1.10, -1.80);
+				glScalef(0.1,0.9,0.1);
+				Base1.prisma3(1.0, 1.0, 1.0,MaderaBase1.GLindex);
+			glPopMatrix();
+
+		   glPushMatrix(); //Soporte
+				glTranslatef(1.75, 1.5, -1.20);
+				glScalef(0.4,0.1,0.1);
+				Base1.prisma3(1.0, 1.0, 1.0,MaderaBase1.GLindex);
+			glPopMatrix();
+
+			glPushMatrix(); //Soporte
+				glTranslatef(1.75, 1.5, -1.8);
+				glScalef(0.45,0.1,0.1);
+				Base1.prisma3(1.0, 1.0, 1.0,MaderaBase1.GLindex);
+			glPopMatrix();
+
+			glPushMatrix(); //Soporte
+				glTranslatef(1.5, 1.5, -1.5);
+				glScalef(0.1,0.1,0.5);
+				Base1.prisma3(1.0, 1.0, 1.0,MaderaBase1.GLindex);
+			glPopMatrix();
+
+			glPushMatrix(); //Soporte
+				glTranslatef(2.0, 1.5, -1.5);
+				glScalef(0.1,0.1,0.5);
+				Base1.prisma3(1.0, 1.0, 1.0,MaderaBase1.GLindex);
+			glPopMatrix();
+
+
+			glPushMatrix(); //Mesa
+				glTranslatef(1.75, 1.55, -1.5);
+				glScalef(2.0,0.05,1.0);
+				Base1.prisma3(1.0, 1.0, 1.0,Madera.GLindex);
+			glPopMatrix();
+	}
 void cuadro(void) {
 	glPushMatrix();
 	glTranslatef(0, 0, 0);
@@ -1525,14 +1603,24 @@ void InitGL(GLvoid)     // Inicializamos parametros
 	textTouchPad.BuildGLTexture();
 	textTouchPad.ReleaseImage();
 
+	//MESA Carga de las texturas
+	MaderaBase1.LoadTGA("Texturas/Madera_Base1.tga");
+	MaderaBase1.BuildGLTexture();
+	MaderaBase1.ReleaseImage();
+
+	Madera.LoadTGA("Texturas/Madera.tga");
+	Madera.BuildGLTexture();
+	Madera.ReleaseImage();
+	/////Mesa
+
 	//..........................Modelos 3ds..........................//
 
-	Mesa._3dsLoad("Table 2.3ds");
+	//Mesa._3dsLoad("Table 2.3ds");
 	sillon._3dsLoad("Casa/sillon.3DS");
 	sillon2._3dsLoad("Casa/sillon.3DS");
 	mueble._3dsLoad("Casa/mueble.3DS");
 
-	//silla1._3dsLoad("Modelos/silla1.3ds");
+	silla1._3dsLoad("Modelos/Chair N210916.3DS");
 	//silla2._3dsLoad("Modelos/silla2.3ds");
 	//silla3._3dsLoad("Modelos/silla3.3ds");
 	//silla4._3dsLoad("Modelos/silla4.3ds");
@@ -1616,8 +1704,8 @@ void display(void){  // Creamos la funcion donde se dibuja
 	glPushMatrix(); //-------------------------------Creamos Silla
 		glDisable(GL_LIGHTING);
 		glTranslatef(1, -2.5, -10);
-		//glScalef(1,1.8,1);
-		//silla4.GLrender(NULL,_SHADED,1.0);
+		glScalef(0.5,0.5,0.5);
+		//silla1.GLrender(NULL,_SHADED,1.0);
 		glEnable(GL_LIGHTING);
 	glPopMatrix();
 
@@ -1625,15 +1713,15 @@ void display(void){  // Creamos la funcion donde se dibuja
 	glPushMatrix();
 		glTranslated(26, 1, -20);
 		glScalef(0.40, 0.3, 0.40);
-		silla();
+		//silla();
 	glPopMatrix();
 	
 	glPushMatrix();
-		glDisable(GL_COLOR_MATERIAL);//........................Poner mesa 3ds
-		glRotatef(0, 1, 0, 0);
-		glScalef(0.05, 0.05, 0.05);
-		glTranslatef(480, 33, -450);
-		Mesa.GLrender(NULL, _SHADED, 1.0);  //_WIRED O _POINTS
+		glDisable(GL_COLOR_MATERIAL);//------------------Crea Mesa
+		//glRotatef(0, 1, 0, 0);
+		glTranslatef(25, -1, -13);
+		glScalef(3,2,2);
+		Mesa();
 	glPopMatrix();
 
 	glPushMatrix(); //-------------------------------Creamos chimenea
@@ -1660,7 +1748,7 @@ void display(void){  // Creamos la funcion donde se dibuja
 	glPopMatrix();
 
 	glPushMatrix();//------------------------------dodecaedromini
-		glTranslatef(25, 2.0, -23);
+		glTranslatef(28.5, 2.29, -16);
 		glScalef(0.08, 0.08, 0.08);
 		glRotatef(rotD * 2, 0, 1, 0);
 		glRotatef(rotD, 1, 0, 0);
@@ -1740,7 +1828,7 @@ void display(void){  // Creamos la funcion donde se dibuja
 	glPushMatrix();//.......................otra silla
 		glTranslatef(23.5, 1, -22);
 		glRotatef(90, 0, 1, 0);
-		silla(0.3, 0.15, 0.3, 0, 0, 0);
+		//silla(0.3, 0.15, 0.3, 0, 0, 0);
 	glPopMatrix();
 
 	glPushMatrix();
