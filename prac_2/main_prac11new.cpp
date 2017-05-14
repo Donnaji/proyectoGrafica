@@ -32,11 +32,12 @@ boolean actJ = FALSE;
 boolean actJ1 = TRUE;
 
 
-//Carga de Figuras
 
+//Carga de Figuras
 #define MAX_FRAMES 10
 int i_max_steps = 25;
 int i_curr_steps = 0;
+
 typedef struct _frame
 {
 	//Variables para GUARDAR Key Frames
@@ -62,7 +63,6 @@ typedef struct _frame
 	float giroMonitoInc;
 
 }FRAME;
-
 FRAME KeyFrame[MAX_FRAMES];
 int FrameIndex = 0;			//introducir datos
 bool play = false;
@@ -94,11 +94,11 @@ bool	light1 = false;
 GLfloat LightPosition1[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 
-//VERDE
-GLfloat LightAmbient2[] = { 1.0f, 0.5f, 0.0f, 1.0f }; 			// Ambient Light Values 
-GLfloat LightDiffuse2[] = { 0.5f, 0.0f, 0.0f, 1.0f };				// Diffuse Light Values 
-GLfloat LightSpecular2[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values blanco
-bool	light2 = false;
+//ROJA
+GLfloat LightAmbient4[] = { 0.8f, 0.0f, 0.0f, 1.0f }; 			// Ambient Light Values 
+GLfloat LightDiffuse4[] = { 1.0f, 0.5f, 0.0f, 1.0f };				// Diffuse Light Values 
+GLfloat LightSpecular4[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values blanco
+bool	light4 = false;
 
 //AZUL
 GLfloat LightAmbient3[] = { 0.0f, 0.0f, 1.0f, 1.0f }; 			// Ambient Light Values 
@@ -200,6 +200,28 @@ CTexture Ladrillo_sqrt;
 CTexture fire_ch;
 //Dodecaedro
 CTexture Dodecaedro;
+
+//canica UNO
+GLfloat mat_ambient2[] = { 0.19225, 0.19225, 0.19225, 1.0 };					// Color background
+GLfloat mat_diffuse2[] = { 0.50754, 0.50754, 0.50754, 1.0 };					// Object Color main 
+GLfloat mat_specular2[] = { 0.508273, 0.508273, 0.508273, 1.0 };				// Specular color
+GLfloat mat_shininess2[] = { 0.4 * 128 };
+
+//canica dos
+GLfloat mat_ambient3[] = { 0.0, 0.1, 0.06, 1.0 };					// Color background
+GLfloat mat_diffuse3[] = { 0.0, 0.50980392, 0.50980392, 1.0 };					// Object Color main 
+GLfloat mat_specular3[] = { 0.50196078,0.50196078,0.50196078, 1.0 };				// Specular color
+GLfloat mat_shininess3[] = { 0.25 * 128 };
+
+//canica tres
+GLfloat mat_ambient4[] = { 0,0,0, 1.0 };					// Color background
+GLfloat mat_diffuse4[] = { 0.5, 0.5, 0.0, 1.0 };					// Object Color main 
+GLfloat mat_specular4[] = { 0.60, 0.60, 0.50, 1.0 };				// Specular color
+GLfloat mat_shininess4[] = { 0.25 * 128 };
+
+CTexture t_hoyo;
+CTexture t_hexa;
+CFiguras fig;
 
 
 //// Mesa 
@@ -351,6 +373,175 @@ void Chimenea() {
 		fig5.prisma2(Ladrillo_sqrt.GLindex, Ladrillo_sqrt.GLindex);
 		glDisable(GL_ALPHA_TEST);
 		glEnable(GL_LIGHTING);
+	glPopMatrix();
+
+}
+
+void trianguloTablero(GLuint t_texture) {
+	GLfloat vertice[6][3] = {
+		{ 0.0 , 0, 0.0 },   //a
+		{ 2 , 3.5, 0 },  //c  
+		{ 4 ,0 , 0 },  //b  
+		{ 0 ,0, -1 },
+		{ 2  ,3.5 , -1 },
+		{ 4  ,0 , -1 }
+	};
+
+
+	glBindTexture(GL_TEXTURE_2D, t_texture);
+	glBegin(GL_POLYGON);	//frente
+							//glColor3f(1, 0, 0);
+	glNormal3f(0.0f, 0.0f, 1.0f);
+	glTexCoord2f(0.0f, 0.0f);   glVertex3fv(vertice[0]);
+	glTexCoord2f(0.5f, 1.0f);	glVertex3fv(vertice[1]);
+	glTexCoord2f(1.0f, 0.0f);	glVertex3fv(vertice[2]);
+	glEnd();
+
+	glBegin(GL_POLYGON);	//atras		
+		glVertex3fv(vertice[3]);
+		glVertex3fv(vertice[4]);
+		glVertex3fv(vertice[5]);
+	glEnd();
+
+	glBegin(GL_POLYGON);	//lateral izquierdo		
+	glVertex3fv(vertice[0]);
+	glVertex3fv(vertice[3]);
+	glVertex3fv(vertice[4]);
+	glVertex3fv(vertice[1]);
+	glEnd();
+
+	glBegin(GL_POLYGON);	//lateral derecho		
+	glVertex3fv(vertice[1]);
+	glVertex3fv(vertice[4]);
+	glVertex3fv(vertice[5]);
+	glVertex3fv(vertice[2]);
+	glEnd();
+
+
+	glBegin(GL_POLYGON);	//lateral inferior		
+	glVertex3fv(vertice[0]);
+	glVertex3fv(vertice[3]);
+	glVertex3fv(vertice[5]);
+	glVertex3fv(vertice[2]);
+	glEnd();
+}
+
+void hexaTablero(GLuint text_hexa) {
+	GLfloat vertice[12][3] = {
+		{ 0.0 , 0, 0.0 },   //a
+		{ 4, 0, 0 },  //b 
+		{ 6 ,3.46 , 0 },  //c
+		{ 4 ,6.93, 0 },
+		{ 0  ,6.93 , 0 },
+		{ -2  ,3.46 , 0 },
+		{ 0.0 , 0, -1 },
+		{ 4, 0, -1 },
+		{ 6 ,3.46 , -1 },
+		{ 4 ,6.93, -1 },
+		{ 0  ,6.93 , -1 },
+		{ -2  ,3.46 , -1 }
+	};
+
+	glBindTexture(GL_TEXTURE_2D, text_hexa);
+
+	glBegin(GL_POLYGON);	//frente	
+	glNormal3f(1.0f, 0.0f, 0.0f);
+	glTexCoord2f(0.25f, 0.0f); glVertex3fv(vertice[0]);
+	glTexCoord2f(0.0f, 0.5f); glVertex3fv(vertice[5]);
+	glTexCoord2f(0.25f, 1.0f); glVertex3fv(vertice[4]);
+	glTexCoord2f(0.75f, 1.0f); glVertex3fv(vertice[3]);
+	glTexCoord2f(1.0f, 0.5f); glVertex3fv(vertice[2]);
+	glTexCoord2f(0.75f, 0.0f); glVertex3fv(vertice[1]);
+	glEnd();
+
+	glBegin(GL_POLYGON);	//atras
+	glVertex3fv(vertice[6]);
+	glVertex3fv(vertice[11]);
+	glVertex3fv(vertice[10]);
+	glVertex3fv(vertice[9]);
+	glVertex3fv(vertice[8]);
+	glVertex3fv(vertice[7]);
+	glEnd();
+
+	glBegin(GL_POLYGON);	//lateral izquierda superior		
+	glVertex3fv(vertice[5]);
+	glVertex3fv(vertice[11]);
+	glVertex3fv(vertice[10]);
+	glVertex3fv(vertice[4]);
+	glEnd();
+
+	glBegin(GL_POLYGON);	//lateral izquierda inferior
+	glVertex3fv(vertice[0]);
+	glVertex3fv(vertice[6]);
+	glVertex3fv(vertice[11]);
+	glVertex3fv(vertice[5]);
+	glEnd();
+
+	glBegin(GL_POLYGON);	//latera superior
+	glVertex3fv(vertice[4]);
+	glVertex3fv(vertice[10]);
+	glVertex3fv(vertice[9]);
+	glVertex3fv(vertice[3]);
+	glEnd();
+
+	glBegin(GL_POLYGON);	//latera inferior		
+	glVertex3fv(vertice[0]);
+	glVertex3fv(vertice[6]);
+	glVertex3fv(vertice[7]);
+	glVertex3fv(vertice[1]);
+	glEnd();
+
+	glBegin(GL_POLYGON);	//latera derecha superior		
+	glVertex3fv(vertice[2]);
+	glVertex3fv(vertice[8]);
+	glVertex3fv(vertice[9]);
+	glVertex3fv(vertice[3]);
+	glEnd();
+
+	glBegin(GL_POLYGON);	//latera derecha inferior		
+	glVertex3fv(vertice[1]);
+	glVertex3fv(vertice[2]);
+	glVertex3fv(vertice[8]);
+	glVertex3fv(vertice[7]);
+	glEnd();
+}
+
+void tableroDamas(GLuint text_triangulo, GLuint text_Hexa) {
+	glPushMatrix();
+	hexaTablero(text_Hexa);
+	//pico izquierdo superior
+	glPushMatrix();
+	glTranslated(-2, 3.5, 0);
+	glRotated(60, 0, 0, 1);
+	trianguloTablero(text_triangulo);
+	glPopMatrix();
+	//pico izquierdo inferior
+	glPushMatrix();
+	glTranslated(-4, 0, 0);
+	trianguloTablero(text_triangulo);
+	glPopMatrix();
+	//pico derecho inferior
+	glPushMatrix();
+	glTranslated(4, 0, 0);
+	trianguloTablero(text_triangulo);
+	glPopMatrix();
+	//pico derecho superior
+	glPushMatrix();
+	glTranslated(6, 3.5, 0);
+	glRotated(60, 0, 0, 1);
+	trianguloTablero(text_triangulo);
+	glPopMatrix();
+	//pico superior
+	glPushMatrix();
+	glTranslated(0, 6.93, 0);
+	trianguloTablero(text_triangulo);
+	glPopMatrix();
+	//pico inferior
+	glPushMatrix();
+	glTranslated(4, 0, 0);
+	glRotated(180, 0, 0, 1);
+	trianguloTablero(text_triangulo);
+	glPopMatrix();
 	glPopMatrix();
 
 }
@@ -557,17 +748,19 @@ void luces() {
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse1);
 	glLightfv(GL_LIGHT1, GL_SPECULAR, LightSpecular1);
 
-	glLightfv(GL_LIGHT2, GL_AMBIENT, LightAmbient2);
-	glLightfv(GL_LIGHT2, GL_DIFFUSE, LightDiffuse2);
-	glLightfv(GL_LIGHT2, GL_SPECULAR, LightSpecular2);
-	glLightf(GL_LIGHT2, GL_SPOT_CUTOFF, 13.0);
-	glLightf(GL_LIGHT2, GL_SPOT_EXPONENT, 1);
-
 	glLightfv(GL_LIGHT3, GL_AMBIENT, LightAmbient3);
 	glLightfv(GL_LIGHT3, GL_DIFFUSE, LightDiffuse3);
 	glLightfv(GL_LIGHT3, GL_SPECULAR, LightSpecular3);
-	glLightf(GL_LIGHT3, GL_SPOT_CUTOFF, 13.0);
+	glLightf(GL_LIGHT3, GL_SPOT_CUTOFF, 20.0);
 	glLightf(GL_LIGHT3, GL_SPOT_EXPONENT, 1);
+
+	glLightfv(GL_LIGHT4, GL_AMBIENT, LightAmbient4);
+	glLightfv(GL_LIGHT4, GL_DIFFUSE, LightDiffuse4);
+	glLightfv(GL_LIGHT4, GL_SPECULAR, LightSpecular4);
+	glLightf(GL_LIGHT4, GL_SPOT_CUTOFF, 15.0);
+	glLightf(GL_LIGHT4, GL_SPOT_EXPONENT, 1);
+
+	
 }
 
 void InitGL(GLvoid)     // Inicializamos parametros
@@ -585,6 +778,15 @@ void InitGL(GLvoid)     // Inicializamos parametros
 
 	glEnable(GL_AUTO_NORMAL);
 	glEnable(GL_NORMALIZE);
+
+	t_hoyo.LoadTGA("triMad.tga");
+	t_hoyo.BuildGLTexture();
+	t_hoyo.ReleaseImage();
+
+	t_hexa.LoadTGA("hexa1.tga");
+	t_hexa.BuildGLTexture();
+	t_hexa.ReleaseImage();
+
 
 	text1.LoadBMP("01.bmp");
 	text1.BuildGLTexture();
@@ -738,24 +940,6 @@ void InitGL(GLvoid)     // Inicializamos parametros
 		KeyFrame[i].posX = 0;
 		KeyFrame[i].posY = 0;
 		KeyFrame[i].posZ = 0;
-		KeyFrame[i].incX = 0;
-		KeyFrame[i].incY = 0;
-		KeyFrame[i].incZ = 0;
-		KeyFrame[i].rotRodIzq = 0;
-		KeyFrame[i].rotMusIzq = 0;
-		KeyFrame[i].rotMusIzqInc = 0;
-		KeyFrame[i].rotBraIzq = 0;
-		KeyFrame[i].rotBraIzqInc = 0;
-		KeyFrame[i].rotBraDer = 0;
-		KeyFrame[i].rotBraDerInc = 0;
-
-		KeyFrame[i].rotBraIzqEn = 0;
-		KeyFrame[i].rotBraIzqEnInc = 0;
-		KeyFrame[i].rotBraDerEn = 0;
-		KeyFrame[i].rotBraDerEnInc = 0;
-		KeyFrame[i].rotInc = 0;
-		KeyFrame[i].giroMonito = 0;
-		KeyFrame[i].giroMonitoInc = 0;
 	}
 	
 
@@ -779,19 +963,21 @@ void display(void) {  // Creamos la funcion donde se dibuja
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 	
-
+	
 	//CONTROL DE LUCES
-	glLightfv(GL_LIGHT0, GL_POSITION, LightPosition2);
-	luces(); 
-	if (light) {		
-		glEnable(GL_LIGHT0);
-	}
-	else {
-		glDisable(GL_LIGHT0);
-	}
-	glEnable(GL_LIGHTING);
+	glPushMatrix(); //LUZ
+		glLightfv(GL_LIGHT0, GL_POSITION, LightPosition2);
+		luces(); 
+		if (light) {		
+			glEnable(GL_LIGHT0);
+		}
+		else {
+			glDisable(GL_LIGHT0);
+		}
+		glEnable(GL_LIGHTING);
+	glPopMatrix();//LUZ
 	//FIN DE CONTROL DE LUCES
-
+	
 	glRotatef(g_lookupdown, 1.0f, 0, 0);
 	gluLookAt(objCamera.mPos.x, objCamera.mPos.y, objCamera.mPos.z,
 		objCamera.mView.x, objCamera.mView.y, objCamera.mView.z,
@@ -802,8 +988,192 @@ void display(void) {  // Creamos la funcion donde se dibuja
 		glTranslatef(0, 60, 0);
 		fig1.skybox(130.0, 130.0, 130.0, text1.GLindex);
 		glEnable(GL_LIGHTING);
-	glPopMatrix();
+	glPopMatrix(); //CIELO
 
+	glPushMatrix();  //----LAMPARAS DE ESQUINAS
+
+		glPushMatrix();
+			glTranslatef(18, 7.6, -28.5);
+			lampara.cono(1.0, 0.4, 50, textLampara.GLindex);
+		glPopMatrix();
+
+		
+		glPushMatrix();
+			glTranslatef(18, 7.6, -5);
+			glLightfv(GL_LIGHT4, GL_POSITION, LightPosition2);
+			glLightfv(GL_LIGHT4, GL_SPOT_DIRECTION, LightDirection2);
+			lampara.cono(1.0, 0.4, 50, textLampara.GLindex);	
+			glDisable(GL_LIGHTING);
+			if (light4) {
+				glEnable(GL_LIGHT4);
+			}
+			else {
+				glDisable(GL_LIGHT4);
+			}
+			glEnable(GL_LIGHTING);
+		glPopMatrix();
+
+		glPushMatrix();
+			glTranslatef(41, 7.6, -28);
+			glLightfv(GL_LIGHT3, GL_POSITION, LightPosition2);
+			glLightfv(GL_LIGHT3, GL_SPOT_DIRECTION, LightDirection2);
+			lampara.cono(1.0, 0.4, 50, textLampara.GLindex);
+
+			glDisable(GL_LIGHTING);
+			if (light3) {
+				glEnable(GL_LIGHT3);
+			}
+			else {
+				glDisable(GL_LIGHT3);
+			}
+			glEnable(GL_LIGHTING);
+		glPopMatrix();
+
+		glPushMatrix();
+			glTranslatef(42, 7.6, -5);
+			lampara.cono(1.0, 0.4, 50, textLampara.GLindex);
+		glPopMatrix();
+		//glEnable(GL_LIGHTING);
+	glPopMatrix(); //LAMPARA
+
+	glPushMatrix();//------------------Creamos  Mesa		
+	glTranslatef(25, -1, -13);
+	glScalef(3, 2, 2);
+	Mesa();
+	glPopMatrix();//MESA
+
+	glPushMatrix(); //-------------------------------Creamos chimenea
+		glTranslatef(1, 1, 1);
+		glScalef(0.5, 0.5, 0.5);
+		Chimenea();
+	glPopMatrix();//CHIMENEA
+
+	glPushMatrix();//...........................dibuja poster 	
+		glTranslatef(42.75, 4, -15);
+		poster();
+	glPopMatrix();//POSTER
+
+	glPushMatrix();//...........................dibuja cuadro 
+		glTranslatef(17.3, 4, -15);
+		cuadro();
+	glPopMatrix();//CUADRO
+
+	glPushMatrix();//------------------------------dodecaedromini
+		glTranslatef(28.5, 2.29, -16);
+		glScalef(0.08, 0.08, 0.08);
+		glRotatef(rotD * 2, 0, 1, 0);
+		glRotatef(rotD, 1, 0, 0);
+		glRotatef(rotD, 1, 0, 0);
+		fig5.dodecaedro(Dodecaedro.GLindex, 0);
+	glPopMatrix();//DODE
+
+	glPushMatrix(); // TABLERO
+		glTranslatef(31, 2.3, -15.6);
+		glScalef(0.08, 0.08, 0.08);
+		glRotated(-90, 1, 0, 0);
+
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+		glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+		glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+		tableroDamas(t_hoyo.GLindex, t_hexa.GLindex);
+
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse2);
+		glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient2);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular2);
+		glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess2);
+
+		glPushMatrix();//CANICAS IZQUIERDA
+			glTranslatef(-3.2, 0.5, 0);
+			glTranslated(posX, posY, 0.0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+		glPopMatrix();
+
+		glPushMatrix();
+			glTranslatef(-2.3, 0.5, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(-0.5, 0.7, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(0.8, 0.0, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(0.8, 0.0, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(-0.4, 0.8, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(-0.8, 0.0, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(0.4, 0.8, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(1.55, -0.7, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(0.8, 0, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+		glPopMatrix();
+
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse3);
+		glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient3);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular3);
+		glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess3);
+
+		glPushMatrix();
+			glTranslatef(2, 9.6, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(-0.4, -0.8, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(0.8, 0, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(-0.4, -0.8, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(-0.8, 0, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(-0.4, -0.6, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(1.2, -1, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(1, 0, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(-0.5, -0.7, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(0.8, 0, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+		glPopMatrix();
+
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse4);
+		glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient4);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular4);
+		glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess4);
+		glPushMatrix();
+			glTranslatef(7.2, 6.5, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(-0.8, 0, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(0.3, -0.6, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(-0.8, 0, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(-0.8, 0, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(-0.5, 0.7, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(0.9, -1.5, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(0.8, 0, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(-1.8, 0, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+			glTranslatef(-0.8, 0, 0);
+			fig.esfera(0.3, 20.0, 20.0, 0);
+		glPopMatrix();
+
+	glPopMatrix();// TABLERO
+
+	glPushMatrix();//-----------------------librero
+		glTranslatef(18.5, 0, -18.5);
+		glRotatef(180, 1, 0, 0);		
+		glScalef(0.15, 0.15, 0.15);	
+		Librero();
+	glPopMatrix();//LIBRERO
+		
 	glPushMatrix(); //-------------------------------Creamos Silla1
 		glTranslatef(30, 0, -19);
 		glScalef(0.10, 0.08, 0.09);
@@ -827,81 +1197,8 @@ void display(void) {  // Creamos la funcion donde se dibuja
 		glTranslatef(25.0, 0, -16);
 		glScalef(0.03, 0.03, 0.03);
 		glRotated(90, 0, 1, 0);
-		silla4.GLrender(NULL, _SHADED, 1.0);
+		silla4.GLrender(NULL, _SHADED, 1.0);		
 	glPopMatrix();
-
-	glPushMatrix();//------------------Creamos  Mesa
-		glTranslatef(25, -1, -13);
-		glScalef(3, 2, 2);
-		Mesa();
-	glPopMatrix();
-
-	glPushMatrix(); //-------------------------------Creamos chimenea
-		glTranslatef(1, 1, 1);
-		glScalef(0.5, 0.5, 0.5);
-		Chimenea();
-		glEnable(GL_LIGHTING);
-	glPopMatrix();
-
-	glPushMatrix();//...........................dibuja poster 	
-		glTranslatef(42.75, 4, -15);
-		poster();
-		glEnable(GL_LIGHTING);
-	glPopMatrix();
-
-	glPushMatrix();//...........................dibuja cuadro 
-		glTranslatef(17.3, 4, -15);
-		cuadro();
-		glEnable(GL_LIGHTING);
-	glPopMatrix();
-
-	glPushMatrix();//------------------------------dodecaedromini
-		glTranslatef(28.5, 2.29, -16);
-		glScalef(0.08, 0.08, 0.08);
-		glRotatef(rotD * 2, 0, 1, 0);
-		glRotatef(rotD, 1, 0, 0);
-		glRotatef(rotD, 1, 0, 0);		
-		fig5.dodecaedro(Dodecaedro.GLindex, 0);
-		glEnable(GL_LIGHTING);
-	glPopMatrix();
-
-	glPushMatrix();  //----LAMPARAS DE ESQUINAS
-		glPushMatrix(); 
-			glTranslatef(18, 7.6, -28.5);	
-			glLightfv(GL_LIGHT2, GL_POSITION, LightPosition2);
-			glLightfv(GL_LIGHT2, GL_SPOT_DIRECTION, LightDirection2);
-			lampara.cono(1.0, 0.4, 50, textLampara.GLindex);
-		glPopMatrix();
-
-		glPushMatrix();
-			glTranslatef(18, 7.6, -5);
-			lampara.cono(1.0, 0.4, 50, textLampara.GLindex);
-		glPopMatrix();
-
-		glPushMatrix(); 
-			glTranslatef(42, 7.6, -28.5);
-			glLightfv(GL_LIGHT3, GL_POSITION, LightPosition2);
-			glLightfv(GL_LIGHT3, GL_SPOT_DIRECTION, LightDirection2);
-			lampara.cono(1.0, 0.4, 50, textLampara.GLindex);
-		glPopMatrix();
-
-		glPushMatrix(); 	
-			glTranslatef(42, 7.6, -5);
-			lampara.cono(1.0, 0.4, 50, textLampara.GLindex);
-		glPopMatrix();
-
-		glDisable(GL_LIGHTING);
-		if (light2) {
-			glEnable(GL_LIGHT2);
-			glEnable(GL_LIGHT3);
-		}
-		else {
-			glDisable(GL_LIGHT2);
-			glDisable(GL_LIGHT3);
-		}
-		glEnable(GL_LIGHTING);
-	glPopMatrix();
-
 
 	glPushMatrix();//ventilador y luz de techo
 		glRotatef(0, 0, 1, 0);
@@ -927,7 +1224,7 @@ void display(void) {  // Creamos la funcion donde se dibuja
 			glPopMatrix();
 		glScalef(0.3, 0.3, 0.3);
 		VentiladorT();
-	glPopMatrix();
+	glPopMatrix();//VENTILADOR
 
 	glPushMatrix();//...........................Crea sillon 3ds
 		glTranslatef(33.5, 0, -23);
@@ -959,23 +1256,10 @@ void display(void) {  // Creamos la funcion donde se dibuja
 		glScalef(0.3, 0.3, 0.3);
 		casa();
 		glDisable(GL_LIGHTING);
-	glPushMatrix();
+	glPopMatrix();
+
 	
-	glPushMatrix();//-----------------------librero
-		glRotatef(180, 0, 1, 0);
-		glTranslatef(-36.5, 22, -65.5);
-		glScalef(.7, .7, .7);
-		Librero();
-	glPopMatrix();
 	
-	glEnable(GL_LIGHTING);
-	glPopMatrix();
-
-
-	glColor3f(1.0, 1.0, 1.0);
-
-	glPopMatrix();
-	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_LIGHTING);
 	glColor3f(1.0, 0.0, 0.0);
@@ -988,6 +1272,9 @@ void display(void) {  // Creamos la funcion donde se dibuja
 }
 
 void animacion() {
+
+
+
 	fig3.text_izq -= 0.01;
 	fig3.text_der -= 0.01;
 	if (fig3.text_izq<-1)
@@ -1043,7 +1330,7 @@ void animacion() {
 			{
 				i_curr_steps = 0; //Reset counter
 								  //Interpolation
-				KeyFrame[playIndex].incX = (KeyFrame[playIndex + 1].posX - KeyFrame[playIndex].posX) / i_max_steps;		//100 frames
+			/*	KeyFrame[playIndex].incX = (KeyFrame[playIndex + 1].posX - KeyFrame[playIndex].posX) / i_max_steps;		//100 frames
 				KeyFrame[playIndex].incY = (KeyFrame[playIndex + 1].posY - KeyFrame[playIndex].posY) / i_max_steps;		//100 frames
 				KeyFrame[playIndex].incZ = (KeyFrame[playIndex + 1].posZ - KeyFrame[playIndex].posZ) / i_max_steps;		//100 frames
 				KeyFrame[playIndex].rotInc = (KeyFrame[playIndex + 1].rotRodIzq - KeyFrame[playIndex].rotRodIzq) / i_max_steps;		//100 frames
@@ -1053,12 +1340,12 @@ void animacion() {
 				KeyFrame[playIndex].rotBraDerInc = (KeyFrame[playIndex + 1].rotBraDer - KeyFrame[playIndex].rotBraDer) / i_max_steps;
 
 				KeyFrame[playIndex].rotBraIzqEnInc = (KeyFrame[playIndex + 1].rotBraIzqEn - KeyFrame[playIndex].rotBraIzqEn) / i_max_steps;
-				KeyFrame[playIndex].rotBraDerEnInc = (KeyFrame[playIndex + 1].rotBraDerEn - KeyFrame[playIndex].rotBraDerEn) / i_max_steps;
+				KeyFrame[playIndex].rotBraDerEnInc = (KeyFrame[playIndex + 1].rotBraDerEn - KeyFrame[playIndex].rotBraDerEn) / i_max_steps;*/
 			}
 		}
 		else
 		{
-			posX += KeyFrame[playIndex].incX;
+		/*	posX += KeyFrame[playIndex].incX;
 			posY += KeyFrame[playIndex].incY;
 			posZ += KeyFrame[playIndex].incZ;
 
@@ -1071,18 +1358,18 @@ void animacion() {
 
 			rotBraIzqEn += KeyFrame[playIndex].rotBraIzqEnInc;
 			rotBraDerEn += KeyFrame[playIndex].rotBraDerEnInc;
-			i_curr_steps++;
+			i_curr_steps++;*/
 		}
 
 	}
 
-	frame++;
+/*	frame++;
 	time = glutGet(GLUT_ELAPSED_TIME);
 	if (time - timebase > 1000) {
 		sprintf(s, "FPS:%4.2f", frame*1000.0 / (time - timebase));
 		timebase = time;
 		frame = 0;
-	}
+	}*/
 
 	glutPostRedisplay();
 }
@@ -1139,17 +1426,6 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 			KeyFrame[FrameIndex].posX = posX;
 			KeyFrame[FrameIndex].posY = posY;
 			KeyFrame[FrameIndex].posZ = posZ;
-
-			KeyFrame[FrameIndex].rotRodIzq = rotRodIzq;
-			KeyFrame[FrameIndex].giroMonito = giroMonito;
-			KeyFrame[FrameIndex].rotMusIzq = rotMusIzq;
-			KeyFrame[FrameIndex].rotBraIzq = rotBraIzq;
-			KeyFrame[FrameIndex].rotBraDer = rotBraDer;
-
-			KeyFrame[FrameIndex].rotBraIzqEn = rotBraIzqEn;
-			KeyFrame[FrameIndex].rotBraDerEn = rotBraDerEn;
-
-
 			FrameIndex++;
 		}
 
@@ -1164,7 +1440,7 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 			posY = KeyFrame[0].posY;
 			posZ = KeyFrame[0].posZ;
 
-			rotRodIzq = KeyFrame[0].rotRodIzq;
+			/*rotRodIzq = KeyFrame[0].rotRodIzq;
 			giroMonito = KeyFrame[0].giroMonito;
 			rotMusIzq = KeyFrame[0].rotMusIzq;
 			rotBraIzq = KeyFrame[0].rotBraIzq;
@@ -1182,7 +1458,7 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 			KeyFrame[playIndex].rotBraIzqInc = (KeyFrame[playIndex + 1].rotBraIzq - KeyFrame[playIndex].rotBraIzq) / i_max_steps;
 			KeyFrame[playIndex].rotBraDerInc = (KeyFrame[playIndex + 1].rotBraDer - KeyFrame[playIndex].rotBraDer) / i_max_steps;
 			KeyFrame[playIndex].rotBraIzqEnInc = (KeyFrame[playIndex + 1].rotBraIzqEn - KeyFrame[playIndex].rotBraIzqEn) / i_max_steps;
-			KeyFrame[playIndex].rotBraDerEnInc = (KeyFrame[playIndex + 1].rotBraDerEn - KeyFrame[playIndex].rotBraDerEn) / i_max_steps;
+			KeyFrame[playIndex].rotBraDerEnInc = (KeyFrame[playIndex + 1].rotBraDerEn - KeyFrame[playIndex].rotBraDerEn) / i_max_steps;*/
 
 			play = true;
 			playIndex = 0;
@@ -1233,13 +1509,20 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 		break;
 
 	case 'X':
-		light2 = !light2;
-		if (light2)
-			printf("encender luz 2\n");
+		light4 = !light4;
+		if (light4)
+			printf("encender luz 4\n");
 		else
-			printf("apagar luz 2\n");
+			printf("apagar luz 4\n");
 		break;
 
+	case 'x':
+		light3 = !light3;
+		if (light3)
+			printf("encender luz 3\n");
+		else
+			printf("apagar luz 3\n");
+		break;
 	case '2':
 		objCamera.Position_Camera(25, 4.0f, -20, 25, 2.5f, -45, 0, 1, 0);
 		break;
@@ -1302,15 +1585,6 @@ void menuKeyFrame(int id)
 			KeyFrame[FrameIndex].posY = posY;
 			KeyFrame[FrameIndex].posZ = posZ;
 
-			KeyFrame[FrameIndex].rotRodIzq = rotRodIzq;
-			KeyFrame[FrameIndex].giroMonito = giroMonito;
-			KeyFrame[FrameIndex].rotMusIzq = rotMusIzq;
-			KeyFrame[FrameIndex].rotBraIzq = rotBraIzq;
-			KeyFrame[FrameIndex].rotBraDer = rotBraDer;
-			KeyFrame[FrameIndex].rotBraIzqEn = rotBraIzqEn;
-			KeyFrame[FrameIndex].rotBraDerEn = rotBraDerEn;
-
-
 			FrameIndex++;
 		}
 
@@ -1325,7 +1599,7 @@ void menuKeyFrame(int id)
 			posY = KeyFrame[0].posY;
 			posZ = KeyFrame[0].posZ;
 
-			rotRodIzq = KeyFrame[0].rotRodIzq;
+		/*	rotRodIzq = KeyFrame[0].rotRodIzq;
 			giroMonito = KeyFrame[0].giroMonito;
 			rotMusIzq = KeyFrame[0].rotMusIzq;
 			rotBraIzq = KeyFrame[0].rotBraIzq;
@@ -1343,7 +1617,7 @@ void menuKeyFrame(int id)
 			KeyFrame[playIndex].rotBraDerEnInc = (KeyFrame[playIndex + 1].rotBraDerEn - KeyFrame[playIndex].rotBraDerEn) / i_max_steps;
 			play = true;
 			playIndex = 0;
-			i_curr_steps = 0;
+			i_curr_steps = 0;*/
 		}
 		else
 		{
@@ -1374,7 +1648,7 @@ int main(int argc, char** argv)   // Main Function
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH); // Display Mode (Clores RGB y alpha | Buffer Doble )
 	glutInitWindowSize(800, 600);	// Tamaño de la Ventana
 	glutInitWindowPosition(0, 0);	//Posicion de la Ventana
-	glutCreateWindow("Practica 11"); // Nombre de la Ventana
+	glutCreateWindow("PrOYECTO LABORATORIO"); // Nombre de la Ventana
 									 //glutFullScreen     ( );         // Full Screen
 	InitGL();						// Parametros iniciales de la aplicacion
 	glutDisplayFunc(display);  //Indicamos a Glut función de dibujo
