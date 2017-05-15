@@ -8,9 +8,6 @@
 	Torres Camacho Ismene Donaji
 
 */
-
-
-
 #include "texture.h"
 #include "figuras.h"
 #include "Camera.h"
@@ -19,6 +16,8 @@
 static GLuint ciudad_display_list;	//Display List for the Monito
 
 float posX = 0, posY = 2.5, posZ = -3.5, rotRodIzq = 0;
+float XB1 = 0.0, YB1 = 0.0, ZB1 = 0.0;
+float XB2 = 0.0, YB2 = 0.0, ZB2 = 0.0;
 float giroMonito = 0;
 float rotMusIzq = 0;
 float rotBraIzq = 0;
@@ -28,45 +27,38 @@ float rotBraDerEn = 0;
 float rotV = 0.0;
 float rotD = 0.0;
 float MovJ = 0.0;
+
 boolean actJ = FALSE;
 boolean actJ1 = TRUE;
 
-
-
 //Carga de Figuras
 #define MAX_FRAMES 10
-int i_max_steps = 25;
-int i_curr_steps = 0;
+
+int  max_stepsA = 60;
+int curr_stepsA = 0;
+
+int  max_stepsB = 50;
+int curr_stepsB = 0;
 
 typedef struct _frame
 {
 	//Variables para GUARDAR Key Frames
-	float posX;		//Variable para PosicionX
-	float posY;		//Variable para PosicionY
-	float posZ;		//Variable para PosicionZ
+	float FposX;		//Variable para PosicionX
+	float FposY;		//Variable para PosicionY
+	float FposZ;		//Variable para PosicionZ
 	float incX;		//Variable para IncrementoX
 	float incY;		//Variable para IncrementoY
 	float incZ;		//Variable para IncrementoZ
-	float rotRodIzq;
-	float rotMusIzq;
-	float rotMusIzqInc;
-	float rotBraIzq;
-	float rotBraIzqInc;
-	float rotBraIzqEn;
-	float rotBraIzqEnInc;
-	float rotBraDer;
-	float rotBraDerInc;
-	float rotBraDerEn;
-	float rotBraDerEnInc;
-	float rotInc;
-	float giroMonito;
-	float giroMonitoInc;
-
 }FRAME;
 FRAME KeyFrame[MAX_FRAMES];
-int FrameIndex = 0;			//introducir datos
+FRAME KeyFrame2[MAX_FRAMES];
+int FrameIndexA= 2;			//introducir datos
+
 bool play = false;
-int playIndex = 0;
+bool play2 = false;
+
+int playIndexA = 0;
+int playIndexB = 0;
 
 
 int w = 500, h = 500;
@@ -78,7 +70,8 @@ CCamera objCamera;	//Create objet Camera
 GLfloat g_lookupdown = 0.0f;    // Look Position In The Z-Axis (NEW) 
 
 int font = (int)GLUT_BITMAP_HELVETICA_18;
-
+//Variables para ultima posicion de la camara
+float LastPosition[8];
 
 //luces
 
@@ -106,8 +99,6 @@ GLfloat LightDiffuse3[] = { 0.5f, 0.0f, 1.0f, 1.0f };				// Diffuse Light Values
 GLfloat LightSpecular3[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values blanco
 bool	light3 = false;
 
-
-
 //bronze
 GLfloat mat_ambient[] = { 0.2125, 0.1275, 0.054, 1.0 };					// Color background
 GLfloat mat_diffuse[] = { 0.714, 0.4284, 0.18144 , 1.0 };					// Object Color main 
@@ -128,14 +119,11 @@ GLfloat mat_Pdiffuse[] = { 1.0, 0.829, 0.829, 1.0 };					// Object Color main
 GLfloat mat_Pspecular[] = { 0.296648, 0.296648, 0.296648, 1.0 };				// Specular color
 GLfloat mat_Pshininess[] = { 0.088 * 128 };
 
-
-
 CTexture text1;
 CTexture text3;	//Flecha
 CTexture text4;	//Pavimento
 CTexture text5;	//Pasto01
 CTexture text6;	//Casa01
-
 
 CTexture textLibroCG;
 CTexture textLibrolit;
@@ -146,10 +134,7 @@ CTexture textPuerta;
 CTexture textPuerta_princ;
 CFiguras cono;
 
-
-
 float abrirPuerta = 0;
-
 
 CFiguras fig1;
 CFiguras fig2;
@@ -160,14 +145,14 @@ CFiguras fig6;
 CFiguras fig7;	//Para crear Monito
 
 
-				//Muebles 3ds
-				//CModel Mesa;
+//Muebles 3ds
 CModel sillon;
 CModel sillon2;
 CModel silla1;
 CModel silla2;
 CModel silla3;
 CModel silla4;
+CModel dance;
 
 
 //Casa
@@ -186,7 +171,6 @@ CTexture textPiso;
 CTexture ventana_prueba;
 CTexture textCuadro1;
 CTexture textCuadro2;
-
 
 //Lampara
 CFiguras lampara;
@@ -224,12 +208,13 @@ CTexture t_hexa;
 CFiguras fig;
 
 
-//// Mesa 
+
 //Figura para mesa
 CFiguras Base1;
 //Textura Madera
 CTexture MaderaBase1;
 CTexture Madera;
+
 void ciudad() {
 	glPushMatrix(); //Camino1
 		glTranslatef(23.5, 0.0, 0.0);
@@ -625,76 +610,38 @@ void casa() {
 	return;
 }
 
-
 void Mesa()
 {
 
-
-	glPushMatrix(); //Base 1
-	glTranslatef(1.50, 0.7, -1.5);
-	glScalef(0.1, 0.1, 0.5);
-	Base1.prisma3(1.0, 1.0, 1.0, MaderaBase1.GLindex);
-	glPopMatrix();
-
-	glPushMatrix(); //Base 2
-	glTranslatef(2.0, 0.7, -1.5);
-	glScalef(0.1, 0.1, 0.5);
-	Base1.prisma3(1.0, 1.0, 1.0, MaderaBase1.GLindex);
-	glPopMatrix();
-
-	glPushMatrix(); //Patita
-	glTranslatef(1.50, 1.10, -1.20);
-	glScalef(0.1, 0.9, 0.1);
-	Base1.prisma3(1.0, 1.0, 1.0, MaderaBase1.GLindex);
-	glPopMatrix();
-
-	glPushMatrix(); //Patita
-	glTranslatef(1.50, 1.10, -1.80);
-	glScalef(0.1, 0.9, 0.1);
-	Base1.prisma3(1.0, 1.0, 1.0, MaderaBase1.GLindex);
-	glPopMatrix();
-
-	glPushMatrix(); //Patita
-	glTranslatef(2.0, 1.10, -1.20);
-	glScalef(0.1, 0.9, 0.1);
-	Base1.prisma3(1.0, 1.0, 1.0, MaderaBase1.GLindex);
-	glPopMatrix();
-
-	glPushMatrix(); //Patita
-	glTranslatef(2.0, 1.10, -1.80);
-	glScalef(0.1, 0.9, 0.1);
-	Base1.prisma3(1.0, 1.0, 1.0, MaderaBase1.GLindex);
-	glPopMatrix();
-
-	glPushMatrix(); //Soporte
-	glTranslatef(1.75, 1.5, -1.20);
-	glScalef(0.4, 0.1, 0.1);
-	Base1.prisma3(1.0, 1.0, 1.0, MaderaBase1.GLindex);
-	glPopMatrix();
-
-	glPushMatrix(); //Soporte
-	glTranslatef(1.75, 1.5, -1.8);
-	glScalef(0.45, 0.1, 0.1);
-	Base1.prisma3(1.0, 1.0, 1.0, MaderaBase1.GLindex);
-	glPopMatrix();
-
-	glPushMatrix(); //Soporte
-	glTranslatef(1.5, 1.5, -1.5);
-	glScalef(0.1, 0.1, 0.5);
-	Base1.prisma3(1.0, 1.0, 1.0, MaderaBase1.GLindex);
-	glPopMatrix();
-
-	glPushMatrix(); //Soporte
-	glTranslatef(2.0, 1.5, -1.5);
-	glScalef(0.1, 0.1, 0.5);
-	Base1.prisma3(1.0, 1.0, 1.0, MaderaBase1.GLindex);
-	glPopMatrix();
-
-
-	glPushMatrix(); //Mesa
+	glPushMatrix();
 	glTranslatef(1.75, 1.55, -1.5);
-	glScalef(2.0, 0.05, 1.0);
-	Base1.prisma3(1.0, 1.0, 1.0, Madera.GLindex);
+	Base1.prisma3(0.05, 2.0, 1.0, Madera.GLindex);//Mesa
+
+	glPushMatrix();
+	glTranslatef(-0.25, -0.85, 0);
+	Base1.prisma3(0.1, 0.1, 0.5, MaderaBase1.GLindex);//Base Pata 1
+
+	glTranslatef(0.0, 0.40, 0.30);
+	Base1.prisma3(0.9, 0.1, 0.1, MaderaBase1.GLindex);//pata A
+
+	glTranslatef(0.0, 0.0, -0.50);
+	Base1.prisma3(0.9, 0.1, 0.1, MaderaBase1.GLindex);//Pata B
+
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.25, -0.85, 0);
+	Base1.prisma3(0.1, 0.1, 0.5, MaderaBase1.GLindex);//Base Pata 2						
+
+	glTranslatef(0.0, 0.40, 0.30);
+	Base1.prisma3(0.9, 0.1, 0.1, MaderaBase1.GLindex);//Pata A
+
+	glTranslatef(0.0, 0.0, -0.50);
+	Base1.prisma3(0.9, 0.1, 0.1, MaderaBase1.GLindex);//Pata B
+
+	glPopMatrix();
+
+
 	glPopMatrix();
 }
 void cuadro(void) {
@@ -927,23 +874,33 @@ void InitGL(GLvoid)     // Inicializamos parametros
 	silla2._3dsLoad("Modelos/silla2.3DS");
 	silla3._3dsLoad("Modelos/silla3.3DS");
 	silla4._3dsLoad("Modelos/silla4.3DS");
+	dance._3dsLoad("Modelos/dance.3ds");
 	
 
-	objCamera.Position_Camera(25, 2.5f, -10, 25, 2.5f, -11, 0, 1, 0);
-
-	
+	objCamera.Position_Camera(25, 2.5f, -10, 25, 2.5f, -11, 0, 1, 0);	
 	ciudad_display_list = createDL();
 
-	
-	for (int i = 0; i<MAX_FRAMES; i++)
-	{
-		KeyFrame[i].posX = 0;
-		KeyFrame[i].posY = 0;
-		KeyFrame[i].posZ = 0;
-	}
+
+	KeyFrame[0].FposX = -0.2;
+	KeyFrame[0].FposY = 0.1;
+	KeyFrame[0].FposZ = 0.8;
+
+	KeyFrame[1].FposX = -0.8;
+	KeyFrame[1].FposY = 0;
+	KeyFrame[1].FposZ = 0;	
+
+	KeyFrame2[0].FposX = 0.1;
+	KeyFrame2[0].FposY = -0.2;
+	KeyFrame2[0].FposZ = 1;
+
+	KeyFrame2[1].FposX = 0.7;
+	KeyFrame2[1].FposY = -1.4;
+	KeyFrame2[1].FposZ = 0;
 	
 
 }
+
+
 void pintaTexto(float x, float y, float z, void *font, char *string)
 {
 
@@ -956,7 +913,7 @@ void pintaTexto(float x, float y, float z, void *font, char *string)
 	}
 }
 
-void display(void) {  // Creamos la funcion donde se dibuja
+void display() {  // Creamos la funcion donde se dibuja
 	GLfloat LightPosition2[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	GLfloat LightDirection2[] = { 0.0f, -1.0f, 0.0f };
 
@@ -993,7 +950,7 @@ void display(void) {  // Creamos la funcion donde se dibuja
 	glPushMatrix();  //----LAMPARAS DE ESQUINAS
 
 		glPushMatrix();
-			glTranslatef(18, 7.6, -28.5);
+			glTranslatef(18.4, 7.6, -28.5);
 			lampara.cono(1.0, 0.4, 50, textLampara.GLindex);
 		glPopMatrix();
 
@@ -1033,7 +990,7 @@ void display(void) {  // Creamos la funcion donde se dibuja
 			glTranslatef(42, 7.6, -5);
 			lampara.cono(1.0, 0.4, 50, textLampara.GLindex);
 		glPopMatrix();
-		//glEnable(GL_LIGHTING);
+		
 	glPopMatrix(); //LAMPARA
 
 	glPushMatrix();//------------------Creamos  Mesa		
@@ -1068,7 +1025,7 @@ void display(void) {  // Creamos la funcion donde se dibuja
 	glPopMatrix();//DODE
 
 	glPushMatrix(); // TABLERO
-		glTranslatef(31, 2.3, -15.6);
+		glTranslatef(29.8, 2.3, -15.6);
 		glScalef(0.08, 0.08, 0.08);
 		glRotated(-90, 1, 0, 0);
 
@@ -1084,8 +1041,7 @@ void display(void) {  // Creamos la funcion donde se dibuja
 		glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess2);
 
 		glPushMatrix();//CANICAS IZQUIERDA
-			glTranslatef(-3.2, 0.5, 0);
-			glTranslated(posX, posY, 0.0);
+			glTranslatef(-3.2, 0.5, 0);			
 			fig.esfera(0.3, 20.0, 20.0, 0);
 		glPopMatrix();
 
@@ -1134,7 +1090,9 @@ void display(void) {  // Creamos la funcion donde se dibuja
 			fig.esfera(0.3, 20.0, 20.0, 0);
 			glTranslatef(-0.5, -0.7, 0);
 			fig.esfera(0.3, 20.0, 20.0, 0);
+
 			glTranslatef(0.8, 0, 0);
+			glTranslatef(XB2, YB2, ZB2);			
 			fig.esfera(0.3, 20.0, 20.0, 0);
 		glPopMatrix();
 
@@ -1161,19 +1119,26 @@ void display(void) {  // Creamos la funcion donde se dibuja
 			fig.esfera(0.3, 20.0, 20.0, 0);
 			glTranslatef(-1.8, 0, 0);
 			fig.esfera(0.3, 20.0, 20.0, 0);
-			glTranslatef(-0.8, 0, 0);
+			glTranslatef(-0.8, 0.0, 0);
+			glTranslatef(XB1, YB1, ZB1);
 			fig.esfera(0.3, 20.0, 20.0, 0);
 		glPopMatrix();
 
 	glPopMatrix();// TABLERO
 
 	glPushMatrix();//-----------------------librero
-		glTranslatef(18.5, 0, -18.5);
+		glTranslatef(18.5, 0.8, -18.5);
 		glRotatef(180, 1, 0, 0);		
 		glScalef(0.15, 0.15, 0.15);	
 		Librero();
 	glPopMatrix();//LIBRERO
 		
+	glPushMatrix(); //-------------------------------Creamos mesa
+		glTranslatef(24.0, 0, -24);
+		glScalef(0.08, 0.09, 0.06);					
+		dance.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+
 	glPushMatrix(); //-------------------------------Creamos Silla1
 		glTranslatef(30, 0, -19);
 		glScalef(0.10, 0.08, 0.09);
@@ -1199,7 +1164,7 @@ void display(void) {  // Creamos la funcion donde se dibuja
 		glRotated(90, 0, 1, 0);
 		silla4.GLrender(NULL, _SHADED, 1.0);		
 	glPopMatrix();
-
+	
 	glPushMatrix();//ventilador y luz de techo
 		glRotatef(0, 0, 1, 0);
 		glTranslatef(30, 7.5, -15);
@@ -1256,9 +1221,7 @@ void display(void) {  // Creamos la funcion donde se dibuja
 		glScalef(0.3, 0.3, 0.3);
 		casa();
 		glDisable(GL_LIGHTING);
-	glPopMatrix();
-
-	
+	glPopMatrix();	
 	
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_LIGHTING);
@@ -1272,8 +1235,6 @@ void display(void) {  // Creamos la funcion donde se dibuja
 }
 
 void animacion() {
-
-
 
 	fig3.text_izq -= 0.01;
 	fig3.text_der -= 0.01;
@@ -1314,62 +1275,73 @@ void animacion() {
 			//rotD=0;
 		}
 	}
-	if (play)
-	{
+	
+	if (play){
 
-		if (i_curr_steps >= i_max_steps) //end of animation between frames?
+		if (curr_stepsA >= max_stepsA) //end of animation between frames?
 		{
-			playIndex++;
-			if (playIndex>FrameIndex - 2)	//end of total animation?
+			playIndexA++;
+			if (playIndexA>FrameIndexA - 2)	//end of total animation?
 			{
 				printf("termina anim\n");
-				playIndex = 0;
+				playIndexA = 0;
 				play = false;
 			}
 			else //Next frame interpolations
 			{
-				i_curr_steps = 0; //Reset counter
+				curr_stepsA = 0; //Reset counter
 								  //Interpolation
-			/*	KeyFrame[playIndex].incX = (KeyFrame[playIndex + 1].posX - KeyFrame[playIndex].posX) / i_max_steps;		//100 frames
-				KeyFrame[playIndex].incY = (KeyFrame[playIndex + 1].posY - KeyFrame[playIndex].posY) / i_max_steps;		//100 frames
-				KeyFrame[playIndex].incZ = (KeyFrame[playIndex + 1].posZ - KeyFrame[playIndex].posZ) / i_max_steps;		//100 frames
-				KeyFrame[playIndex].rotInc = (KeyFrame[playIndex + 1].rotRodIzq - KeyFrame[playIndex].rotRodIzq) / i_max_steps;		//100 frames
-				KeyFrame[playIndex].giroMonitoInc = (KeyFrame[playIndex + 1].giroMonito - KeyFrame[playIndex].giroMonito) / i_max_steps;		//100 frames
-				KeyFrame[playIndex].rotMusIzqInc = (KeyFrame[playIndex + 1].rotMusIzq - KeyFrame[playIndex].rotMusIzq) / i_max_steps;
-				KeyFrame[playIndex].rotBraIzqInc = (KeyFrame[playIndex + 1].rotBraIzq - KeyFrame[playIndex].rotBraIzq) / i_max_steps;
-				KeyFrame[playIndex].rotBraDerInc = (KeyFrame[playIndex + 1].rotBraDer - KeyFrame[playIndex].rotBraDer) / i_max_steps;
-
-				KeyFrame[playIndex].rotBraIzqEnInc = (KeyFrame[playIndex + 1].rotBraIzqEn - KeyFrame[playIndex].rotBraIzqEn) / i_max_steps;
-				KeyFrame[playIndex].rotBraDerEnInc = (KeyFrame[playIndex + 1].rotBraDerEn - KeyFrame[playIndex].rotBraDerEn) / i_max_steps;*/
+				KeyFrame[playIndexA].incX = (KeyFrame[playIndexA + 1].FposX - KeyFrame[playIndexA].FposX) / max_stepsA;		//100 frames
+				KeyFrame[playIndexA].incY = (KeyFrame[playIndexA + 1].FposY - KeyFrame[playIndexA].FposY) / max_stepsA;		//100 frames
+				KeyFrame[playIndexA].incZ = (KeyFrame[playIndexA + 1].FposZ - KeyFrame[playIndexA].FposZ) / max_stepsA;		//100 frames				
 			}
 		}
 		else
 		{
-		/*	posX += KeyFrame[playIndex].incX;
-			posY += KeyFrame[playIndex].incY;
-			posZ += KeyFrame[playIndex].incZ;
-
-
-			rotRodIzq += KeyFrame[playIndex].rotInc;
-			giroMonito += KeyFrame[playIndex].giroMonitoInc;
-			rotMusIzq += KeyFrame[playIndex].rotMusIzqInc;
-			rotBraIzq += KeyFrame[playIndex].rotBraIzqInc;
-			rotBraDer += KeyFrame[playIndex].rotBraDerInc;
-
-			rotBraIzqEn += KeyFrame[playIndex].rotBraIzqEnInc;
-			rotBraDerEn += KeyFrame[playIndex].rotBraDerEnInc;
-			i_curr_steps++;*/
+			XB1 += KeyFrame[playIndexA].incX;
+			YB1 += KeyFrame[playIndexA].incY;
+			ZB1 += KeyFrame[playIndexA].incZ;
+			curr_stepsA++;
 		}
-
 	}
 
-/*	frame++;
+
+	if (play2) {
+
+		if (curr_stepsB >= max_stepsB) //end of animation between frames?
+		{
+			playIndexB++;
+			if (playIndexB>FrameIndexA - 2)	//end of total animation?
+			{
+				printf("termina anim\n");
+				playIndexB = 0;
+				play2 = false;
+			}
+			else //Next frame interpolations
+			{
+				curr_stepsB = 0; //Reset counter
+								 //Interpolation
+				KeyFrame2[playIndexB].incX = (KeyFrame2[playIndexB + 1].FposX - KeyFrame2[playIndexB].FposX) / max_stepsB;		//100 frames
+				KeyFrame2[playIndexB].incY = (KeyFrame2[playIndexB + 1].FposY - KeyFrame2[playIndexB].FposY) / max_stepsB;		//100 frames
+				KeyFrame2[playIndexB].incZ = (KeyFrame2[playIndexB + 1].FposZ - KeyFrame2[playIndexB].FposZ) / max_stepsB;		//100 frames				
+			}
+		}
+		else
+		{
+			XB2 += KeyFrame2[playIndexB].incX;
+			YB2 += KeyFrame2[playIndexB].incY;
+			ZB2 += KeyFrame2[playIndexB].incZ;
+			curr_stepsB++;
+		}
+	}
+
+	frame++;
 	time = glutGet(GLUT_ELAPSED_TIME);
 	if (time - timebase > 1000) {
 		sprintf(s, "FPS:%4.2f", frame*1000.0 / (time - timebase));
 		timebase = time;
 		frame = 0;
-	}*/
+	}
 
 	glutPostRedisplay();
 }
@@ -1400,69 +1372,139 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 	case 'w':   //Movimientos de camara
 	case 'W':
 		objCamera.Move_Camera(CAMERASPEED + 0.2);
+		printf("\nMoveCamera mPos.X: %f", objCamera.mPos.x);
+		LastPosition[0] = objCamera.mPos.x;
+		printf("\nMoveCamera mPos.y: %f", objCamera.mPos.y);
+		LastPosition[1] = objCamera.mPos.y;
+		printf("\nMoveCamera mPos.z: %f", objCamera.mPos.z);
+		LastPosition[2] = objCamera.mPos.z;
+		printf("\nViewCamera mView.x: %f", objCamera.mView.x);
+		LastPosition[3] = objCamera.mView.x;
+		printf("\nViewCamera mView.y: %f", objCamera.mView.y);
+		LastPosition[4] = objCamera.mView.y;
+		printf("\nViewCamera mView.z: %f", objCamera.mView.z);
+		LastPosition[5] = objCamera.mView.z;
+		printf("\npCamera mUp.x: %f", objCamera.mUp.x);
+		LastPosition[6] = objCamera.mUp.x;
+		printf("\npCamera mUp.y: %f", objCamera.mUp.y);
+		LastPosition[7] = objCamera.mUp.y;
+		printf("\npCamera mUp.z: %f", objCamera.mUp.z);
+		LastPosition[8] = objCamera.mUp.z;
+
+		printf("\n");
+
 		break;
 
 	case 's':
 	case 'S':
 		objCamera.Move_Camera(-(CAMERASPEED + 0.2));
+		printf("\nMoveCamera mPos.X: %f", objCamera.mPos.x);
+		printf("\nMoveCamera mPos.X: %f", objCamera.mPos.x);
+		LastPosition[0] = objCamera.mPos.x;
+		printf("\nMoveCamera mPos.y: %f", objCamera.mPos.y);
+		LastPosition[1] = objCamera.mPos.y;
+		printf("\nMoveCamera mPos.z: %f", objCamera.mPos.z);
+		LastPosition[2] = objCamera.mPos.z;
+		printf("\nViewCamera mView.x: %f", objCamera.mView.x);
+		LastPosition[3] = objCamera.mView.x;
+		printf("\nViewCamera mView.y: %f", objCamera.mView.y);
+		LastPosition[4] = objCamera.mView.y;
+		printf("\nViewCamera mView.z: %f", objCamera.mView.z);
+		LastPosition[5] = objCamera.mView.z;
+		printf("\npCamera mUp.x: %f", objCamera.mUp.x);
+		LastPosition[6] = objCamera.mUp.x;
+		printf("\npCamera mUp.y: %f", objCamera.mUp.y);
+		LastPosition[7] = objCamera.mUp.y;
+		printf("\npCamera mUp.z: %f", objCamera.mUp.z);
+		LastPosition[8] = objCamera.mUp.z;
+
+		printf("\n");
 		break;
 
 	case 'a':
 	case 'A':
 		objCamera.Strafe_Camera(-(CAMERASPEED + 0.4));
+		printf("\nMoveCamera mPos.X: %f", objCamera.mPos.x);
+		LastPosition[0] = objCamera.mPos.x;
+		printf("\nMoveCamera mPos.y: %f", objCamera.mPos.y);
+		LastPosition[1] = objCamera.mPos.y;
+		printf("\nMoveCamera mPos.z: %f", objCamera.mPos.z);
+		LastPosition[2] = objCamera.mPos.z;
+		printf("\nViewCamera mView.x: %f", objCamera.mView.x);
+		LastPosition[3] = objCamera.mView.x;
+		printf("\nViewCamera mView.y: %f", objCamera.mView.y);
+		LastPosition[4] = objCamera.mView.y;
+		printf("\nViewCamera mView.z: %f", objCamera.mView.z);
+		LastPosition[5] = objCamera.mView.z;
+		printf("\npCamera mUp.x: %f", objCamera.mUp.x);
+		LastPosition[6] = objCamera.mUp.x;
+		printf("\npCamera mUp.y: %f", objCamera.mUp.y);
+		LastPosition[7] = objCamera.mUp.y;
+		printf("\npCamera mUp.z: %f", objCamera.mUp.z);
+		LastPosition[8] = objCamera.mUp.z;
+		printf("\n");
 		break;
 
 	case 'd':
 	case 'D':
 		objCamera.Strafe_Camera(CAMERASPEED + 0.4);
+		printf("\nMoveCamera mPos.X: %f", objCamera.mPos.x);
+		LastPosition[0] = objCamera.mPos.x;
+		printf("\nMoveCamera mPos.y: %f", objCamera.mPos.y);
+		LastPosition[1] = objCamera.mPos.y;
+		printf("\nMoveCamera mPos.z: %f", objCamera.mPos.z);
+		LastPosition[2] = objCamera.mPos.z;
+		printf("\nViewCamera mView.x: %f", objCamera.mView.x);
+		LastPosition[3] = objCamera.mView.x;
+		printf("\nViewCamera mView.y: %f", objCamera.mView.y);
+		LastPosition[4] = objCamera.mView.y;
+		printf("\nViewCamera mView.z: %f", objCamera.mView.z);
+		LastPosition[5] = objCamera.mView.z;
+		printf("\npCamera mUp.x: %f", objCamera.mUp.x);
+		LastPosition[6] = objCamera.mUp.x;
+		printf("\npCamera mUp.y: %f", objCamera.mUp.y);
+		LastPosition[7] = objCamera.mUp.y;
+		printf("\npCamera mUp.z: %f", objCamera.mUp.z);
+		LastPosition[8] = objCamera.mUp.z;
+		printf("\n");
 		break;
-
-	case 'k':		//
-	case 'K':
-		if (FrameIndex<MAX_FRAMES)
-		{
-			printf("frameindex %d\n", FrameIndex);
-
-			KeyFrame[FrameIndex].posX = posX;
-			KeyFrame[FrameIndex].posY = posY;
-			KeyFrame[FrameIndex].posZ = posZ;
-			FrameIndex++;
-		}
-
-		break;
-
 	case 'l':
-	case 'L':
-		if (play == false && (FrameIndex>1))
-		{
 
-			posX = KeyFrame[0].posX;
-			posY = KeyFrame[0].posY;
-			posZ = KeyFrame[0].posZ;
-
-			/*rotRodIzq = KeyFrame[0].rotRodIzq;
-			giroMonito = KeyFrame[0].giroMonito;
-			rotMusIzq = KeyFrame[0].rotMusIzq;
-			rotBraIzq = KeyFrame[0].rotBraIzq;
-			rotBraDer = KeyFrame[0].rotBraDer;
-
-
-
+		printf("\ANIMACIÓN UNO");
+		if (play2 == false && (FrameIndexA>1)) {
+			XB2 = KeyFrame2[0].FposX;
+			YB2 = KeyFrame2[0].FposY;
+			ZB2 = KeyFrame2[0].FposZ;
 			//First Interpolation
-			KeyFrame[playIndex].incX = (KeyFrame[playIndex + 1].posX - KeyFrame[playIndex].posX) / i_max_steps;		//100 frames
-			KeyFrame[playIndex].incY = (KeyFrame[playIndex + 1].posY - KeyFrame[playIndex].posY) / i_max_steps;		//100 frames
-			KeyFrame[playIndex].incZ = (KeyFrame[playIndex + 1].posZ - KeyFrame[playIndex].posZ) / i_max_steps;		//100 frames
-			KeyFrame[playIndex].rotInc = (KeyFrame[playIndex + 1].rotRodIzq - KeyFrame[playIndex].rotRodIzq) / i_max_steps;		//100 frames
-			KeyFrame[playIndex].giroMonitoInc = (KeyFrame[playIndex + 1].giroMonito - KeyFrame[playIndex].giroMonito) / i_max_steps;		//100 frames
-			KeyFrame[playIndex].rotMusIzqInc = (KeyFrame[playIndex + 1].rotMusIzq - KeyFrame[playIndex].rotMusIzq) / i_max_steps;		//100 frames
-			KeyFrame[playIndex].rotBraIzqInc = (KeyFrame[playIndex + 1].rotBraIzq - KeyFrame[playIndex].rotBraIzq) / i_max_steps;
-			KeyFrame[playIndex].rotBraDerInc = (KeyFrame[playIndex + 1].rotBraDer - KeyFrame[playIndex].rotBraDer) / i_max_steps;
-			KeyFrame[playIndex].rotBraIzqEnInc = (KeyFrame[playIndex + 1].rotBraIzqEn - KeyFrame[playIndex].rotBraIzqEn) / i_max_steps;
-			KeyFrame[playIndex].rotBraDerEnInc = (KeyFrame[playIndex + 1].rotBraDerEn - KeyFrame[playIndex].rotBraDerEn) / i_max_steps;*/
+			KeyFrame2[playIndexB].incX = (KeyFrame2[playIndexB + 1].FposX - KeyFrame2[playIndexB].FposX) / max_stepsB;		//100 frames
+			KeyFrame2[playIndexB].incY = (KeyFrame2[playIndexB + 1].FposY - KeyFrame2[playIndexB].FposY) / max_stepsB;		//100 frames
+			KeyFrame2[playIndexB].incZ = (KeyFrame2[playIndexB + 1].FposZ - KeyFrame2[playIndexB].FposZ) / max_stepsB;		//100 frames
 
+			play2 = true;
+			playIndexB = 0;
+			curr_stepsB = 0;
+		}
+		else{
+			play2 = false;
+		}
+		break;
+
+	case 'L':
+		printf("\ANIMACIÓN DOS");
+		if (play == false && (FrameIndexA>1)){
+
+			XB1 = KeyFrame[0].FposX;
+			YB1 = KeyFrame[0].FposY;
+			ZB1 = KeyFrame[0].FposZ;
+			//First Interpolation
+			KeyFrame[playIndexA].incX = (KeyFrame[playIndexA + 1].FposX - KeyFrame[playIndexA].FposX) / max_stepsA;		//100 frames
+			KeyFrame[playIndexA].incY = (KeyFrame[playIndexA + 1].FposY - KeyFrame[playIndexA].FposY) / max_stepsA;		//100 frames
+			KeyFrame[playIndexA].incZ = (KeyFrame[playIndexA + 1].FposZ - KeyFrame[playIndexA].FposZ) / max_stepsA;		//100 frames
+			
 			play = true;
-			playIndex = 0;
-			i_curr_steps = 0;
+			playIndexA = 0;
+			curr_stepsA = 0;
+
 		}
 		else
 		{
@@ -1524,10 +1566,11 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 			printf("apagar luz 3\n");
 		break;
 	case '2':
-		objCamera.Position_Camera(25, 4.0f, -20, 25, 2.5f, -45, 0, 1, 0);
+		objCamera.Position_Camera(30.84, 3.5f, -16, 22, -3.5f, -16, 0, 1, 0);
 		break;
 	case '3':
-		objCamera.Position_Camera(25, 2.5f, -10, 25, 2.5f, -11, 0, 1, 0);
+		glRotatef(g_lookupdown, 1.0f, 0, 0);
+		objCamera.Position_Camera(LastPosition[0], LastPosition[1], LastPosition[2], LastPosition[3], LastPosition[4], LastPosition[5], LastPosition[6], LastPosition[7], LastPosition[8]);
 		break;
 	case 27:        // Cuando Esc es presionado...
 		exit(0);   // Salimos del programa
@@ -1538,32 +1581,148 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 
 	glutPostRedisplay();
 }
-
 void arrow_keys(int a_keys, int x, int y)  // Funcion para manejo de teclas especiales (arrow keys)
 {
 	switch (a_keys) {
 	case GLUT_KEY_PAGE_UP:
 		objCamera.UpDown_Camera(CAMERASPEED);
+		printf("\nMoveCamera mPos.X: %f", objCamera.mPos.x);
+		LastPosition[0] = objCamera.mPos.x;
+		printf("\nMoveCamera mPos.y: %f", objCamera.mPos.y);
+		LastPosition[1] = objCamera.mPos.y;
+		printf("\nMoveCamera mPos.z: %f", objCamera.mPos.z);
+		LastPosition[2] = objCamera.mPos.z;
+		printf("\nViewCamera mView.x: %f", objCamera.mView.x);
+		LastPosition[3] = objCamera.mView.x;
+		printf("\nViewCamera mView.y: %f", objCamera.mView.y);
+		LastPosition[4] = objCamera.mView.y;
+		printf("\nViewCamera mView.z: %f", objCamera.mView.z);
+		LastPosition[5] = objCamera.mView.z;
+		printf("\npCamera mUp.x: %f", objCamera.mUp.x);
+		LastPosition[6] = objCamera.mUp.x;
+		printf("\npCamera mUp.y: %f", objCamera.mUp.y);
+		LastPosition[7] = objCamera.mUp.y;
+		printf("\npCamera mUp.z: %f", objCamera.mUp.z);
+		LastPosition[8] = objCamera.mUp.z;
+
+		printf("\n");
 		break;
 
 	case GLUT_KEY_PAGE_DOWN:
 		objCamera.UpDown_Camera(-CAMERASPEED);
+		printf("\nMoveCamera mPos.X: %f", objCamera.mPos.x);
+		LastPosition[0] = objCamera.mPos.x;
+		printf("\nMoveCamera mPos.y: %f", objCamera.mPos.y);
+		LastPosition[1] = objCamera.mPos.y;
+		printf("\nMoveCamera mPos.z: %f", objCamera.mPos.z);
+		LastPosition[2] = objCamera.mPos.z;
+		printf("\nViewCamera mView.x: %f", objCamera.mView.x);
+		LastPosition[3] = objCamera.mView.x;
+		printf("\nViewCamera mView.y: %f", objCamera.mView.y);
+		LastPosition[4] = objCamera.mView.y;
+		printf("\nViewCamera mView.z: %f", objCamera.mView.z);
+		LastPosition[5] = objCamera.mView.z;
+		printf("\npCamera mUp.x: %f", objCamera.mUp.x);
+		LastPosition[6] = objCamera.mUp.x;
+		printf("\npCamera mUp.y: %f", objCamera.mUp.y);
+		LastPosition[7] = objCamera.mUp.y;
+		printf("\npCamera mUp.z: %f", objCamera.mUp.z);
+		LastPosition[8] = objCamera.mUp.z;
+		printf("\n");
 		break;
 
 	case GLUT_KEY_UP:     // Presionamos tecla ARRIBA...
 		g_lookupdown -= 1.0f;
+		printf("\nglookupdown: %f", g_lookupdown);
+		printf("\nMoveCamera mPos.X: %f", objCamera.mPos.x);
+		LastPosition[0] = objCamera.mPos.x;
+		printf("\nMoveCamera mPos.y: %f", objCamera.mPos.y);
+		LastPosition[1] = objCamera.mPos.y;
+		printf("\nMoveCamera mPos.z: %f", objCamera.mPos.z);
+		LastPosition[2] = objCamera.mPos.z;
+		printf("\nViewCamera mView.x: %f", objCamera.mView.x);
+		LastPosition[3] = objCamera.mView.x;
+		printf("\nViewCamera mView.y: %f", objCamera.mView.y);
+		LastPosition[4] = objCamera.mView.y;
+		printf("\nViewCamera mView.z: %f", objCamera.mView.z);
+		LastPosition[5] = objCamera.mView.z;
+		printf("\npCamera mUp.x: %f", objCamera.mUp.x);
+		LastPosition[6] = objCamera.mUp.x;
+		printf("\npCamera mUp.y: %f", objCamera.mUp.y);
+		LastPosition[7] = objCamera.mUp.y;
+		printf("\npCamera mUp.z: %f", objCamera.mUp.z);
+		LastPosition[8] = objCamera.mUp.z;
+		printf("\n");
 		break;
 
 	case GLUT_KEY_DOWN:               // Presionamos tecla ABAJO...
 		g_lookupdown += 1.0f;
+		printf("\nglookupdown: %f", g_lookupdown);
+		printf("\nMoveCamera mPos.X: %f", objCamera.mPos.x);
+		LastPosition[0] = objCamera.mPos.x;
+		printf("\nMoveCamera mPos.y: %f", objCamera.mPos.y);
+		LastPosition[1] = objCamera.mPos.y;
+		printf("\nMoveCamera mPos.z: %f", objCamera.mPos.z);
+		LastPosition[2] = objCamera.mPos.z;
+		printf("\nViewCamera mView.x: %f", objCamera.mView.x);
+		LastPosition[3] = objCamera.mView.x;
+		printf("\nViewCamera mView.y: %f", objCamera.mView.y);
+		LastPosition[4] = objCamera.mView.y;
+		printf("\nViewCamera mView.z: %f", objCamera.mView.z);
+		LastPosition[5] = objCamera.mView.z;
+		printf("\npCamera mUp.x: %f", objCamera.mUp.x);
+		LastPosition[6] = objCamera.mUp.x;
+		printf("\npCamera mUp.y: %f", objCamera.mUp.y);
+		LastPosition[7] = objCamera.mUp.y;
+		printf("\npCamera mUp.z: %f", objCamera.mUp.z);
+		LastPosition[8] = objCamera.mUp.z;
+		printf("\n");
 		break;
 
 	case GLUT_KEY_LEFT:
 		objCamera.Rotate_View(-CAMERASPEED);
+		printf("\nMoveCamera mPos.X: %f", objCamera.mPos.x);
+		LastPosition[0] = objCamera.mPos.x;
+		printf("\nMoveCamera mPos.y: %f", objCamera.mPos.y);
+		LastPosition[1] = objCamera.mPos.y;
+		printf("\nMoveCamera mPos.z: %f", objCamera.mPos.z);
+		LastPosition[2] = objCamera.mPos.z;
+		printf("\nViewCamera mView.x: %f", objCamera.mView.x);
+		LastPosition[3] = objCamera.mView.x;
+		printf("\nViewCamera mView.y: %f", objCamera.mView.y);
+		LastPosition[4] = objCamera.mView.y;
+		printf("\nViewCamera mView.z: %f", objCamera.mView.z);
+		LastPosition[5] = objCamera.mView.z;
+		printf("\npCamera mUp.x: %f", objCamera.mUp.x);
+		LastPosition[6] = objCamera.mUp.x;
+		printf("\npCamera mUp.y: %f", objCamera.mUp.y);
+		LastPosition[7] = objCamera.mUp.y;
+		printf("\npCamera mUp.z: %f", objCamera.mUp.z);
+		LastPosition[8] = objCamera.mUp.z;
+		printf("\n");
 		break;
 
 	case GLUT_KEY_RIGHT:
 		objCamera.Rotate_View(CAMERASPEED);
+		printf("\nMoveCamera mPos.X: %f", objCamera.mPos.x);
+		LastPosition[0] = objCamera.mPos.x;
+		printf("\nMoveCamera mPos.y: %f", objCamera.mPos.y);
+		LastPosition[1] = objCamera.mPos.y;
+		printf("\nMoveCamera mPos.z: %f", objCamera.mPos.z);
+		LastPosition[2] = objCamera.mPos.z;
+		printf("\nViewCamera mView.x: %f", objCamera.mView.x);
+		LastPosition[3] = objCamera.mView.x;
+		printf("\nViewCamera mView.y: %f", objCamera.mView.y);
+		LastPosition[4] = objCamera.mView.y;
+		printf("\nViewCamera mView.z: %f", objCamera.mView.z);
+		LastPosition[5] = objCamera.mView.z;
+		printf("\npCamera mUp.x: %f", objCamera.mUp.x);
+		LastPosition[6] = objCamera.mUp.x;
+		printf("\npCamera mUp.y: %f", objCamera.mUp.y);
+		LastPosition[7] = objCamera.mUp.y;
+		printf("\npCamera mUp.z: %f", objCamera.mUp.z);
+		LastPosition[8] = objCamera.mUp.z;
+		printf("\n");
 		break;
 
 	default:
@@ -1577,27 +1736,27 @@ void menuKeyFrame(int id)
 	switch (id)
 	{
 	case 0:
-		if (FrameIndex<MAX_FRAMES)
+		if (FrameIndexA<MAX_FRAMES)
 		{
-			printf("frameindex %d\n", FrameIndex);
+			printf("frameindex %d\n", FrameIndexA);
 
-			KeyFrame[FrameIndex].posX = posX;
-			KeyFrame[FrameIndex].posY = posY;
-			KeyFrame[FrameIndex].posZ = posZ;
+			KeyFrame[FrameIndexA].FposX = posX;
+			KeyFrame[FrameIndexA].FposY = posY;
+			KeyFrame[FrameIndexA].FposZ = posZ;
 
-			FrameIndex++;
+			FrameIndexA++;
 		}
 
 
 		break;
 
 	case 1:
-		if (play == false && FrameIndex >1)
+		if (play == false && FrameIndexA>1)
 		{
 
-			posX = KeyFrame[0].posX;
-			posY = KeyFrame[0].posY;
-			posZ = KeyFrame[0].posZ;
+			posX = KeyFrame[0].FposX;
+			posY = KeyFrame[0].FposY;
+			posZ = KeyFrame[0].FposZ;
 
 		/*	rotRodIzq = KeyFrame[0].rotRodIzq;
 			giroMonito = KeyFrame[0].giroMonito;
